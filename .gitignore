@@ -1,22 +1,77 @@
-# Dependencies
-node_modules
+# Node modules
 
-# yarn error logs
-yarn-error.log
+node_modules/
 
-# Environment varibales
-.env*
-!.env*.example
+# Build output
 
-# Code coverage
-coverage
-
-# misc
-.DS_Store
-
-# Dev db data
-db
+dist/
+build/
 
 # TypeScript
-build
 
+*.tsbuildinfo
+
+# Logs
+
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+
+.env
+.env.*
+!.env.example
+
+# OS files
+
+.DS_Store
+Thumbs.db
+
+# IDE / Editor folders
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dependency directories
+
+jspm_packages/
+
+# Optional npm cache directory
+
+.npm/
+
+# Optional eslint cache
+
+.eslintcache
+
+# Coverage directory
+
+coverage/
+
+# Temporary files
+
+tmp/
+temp/
+
+# Parcel / Next / other bundlers (if used later)
+
+.cache/
+.next/
+out/
+
+# Docker (optional)
+
+docker-compose.override.yml
+
+# Misc
+
+*.tgz
+*.pid
+*.seed
+*.pid.lock

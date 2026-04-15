@@ -23,19 +23,14 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
-    "noImplicitOverride": true,
-
+    "noEmitOnError": true,
+    "moduleDetection": "force",
     /* Additional Checks */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
-
-    /* NestJS-required */
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
 
     /* Output */
     "declaration": true,
