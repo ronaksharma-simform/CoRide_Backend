@@ -1,0 +1,52 @@
+{
+  "name": "coride_backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky",
+    "dev": "node ./src/index.ts",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ronaksharma-simform/CoRide_Backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/ronaksharma-simform/CoRide_Backend/issues"
+  },
+  "homepage": "https://github.com/ronaksharma-simform/CoRide_Backend#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "lint-staged": "^16.4.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.6.0",
+    "@typescript-eslint/eslint-plugin": "^8.58.2",
+    "@typescript-eslint/parser": "^8.58.2",
+    "eslint": "^10.2.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "globals": "^17.5.0",
+    "husky": "^9.1.7",
+    "jiti": "^2.6.1",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.58.2"
+  }
+}

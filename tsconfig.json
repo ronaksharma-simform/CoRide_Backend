@@ -1,0 +1,53 @@
+{
+  "compilerOptions": {
+    /* Language & Environment */
+    "target": "ES2021",
+    "lib": ["ES2021"],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+    /* Paths */
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "types": ["node"],
+    /* Strict Type Checking */
+    "strict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+
+    /* Additional Checks */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* NestJS-required */
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+
+    /* Output */
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "incremental": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
+}
