@@ -43,6 +43,6 @@
     "incremental": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/generated/prisma"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }

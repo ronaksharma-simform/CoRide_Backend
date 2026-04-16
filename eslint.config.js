@@ -10,5 +10,21 @@ export default defineConfig([
     extends: ["js/recommended"],
     languageOptions: { globals: globals.node },
   },
+  {
+    ignores: [
+      "node_modules/",
+      "dist/",
+      "build/",
+      "coverage/",
+      ".env",
+      ".env.*",
+      "*.log",
+      "logs/",
+      "tmp/",
+      "public/",
+      "uploads/",
+      "prisma/generated/",
+    ],
+  },
   tseslint.configs.recommended,
 ]);
