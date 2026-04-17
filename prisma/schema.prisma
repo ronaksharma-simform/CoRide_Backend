@@ -5,9 +5,24 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+model User {
+  id              String   @id @default(uuid())
+  name            String
+  email           String   @unique
+  password        String
+  phone           String  @unique
+  org_name        String
+  role            String
+  gender          String
+  is_org_verified Boolean  @default(false)
+  is_id_verified  Boolean  @default(false)
+  avg_rating      Float    @default(0)
+  total_rides     Int      @default(0)
+  created_at      DateTime @default(now())
 }

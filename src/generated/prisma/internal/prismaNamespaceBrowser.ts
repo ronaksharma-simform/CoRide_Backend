@@ -53,7 +53,9 @@ export const JsonNull = runtime.JsonNull;
  */
 export const AnyNull = runtime.AnyNull;
 
-export const ModelName = {} as const;
+export const ModelName = {
+  User: "User",
+} as const;
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 
@@ -70,3 +72,36 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 
 export type TransactionIsolationLevel =
   (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel];
+
+export const UserScalarFieldEnum = {
+  id: "id",
+  name: "name",
+  email: "email",
+  password: "password",
+  phone: "phone",
+  org_name: "org_name",
+  role: "role",
+  gender: "gender",
+  is_org_verified: "is_org_verified",
+  is_id_verified: "is_id_verified",
+  avg_rating: "avg_rating",
+  total_rides: "total_rides",
+  created_at: "created_at",
+} as const;
+
+export type UserScalarFieldEnum =
+  (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum];
+
+export const SortOrder = {
+  asc: "asc",
+  desc: "desc",
+} as const;
+
+export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder];
+
+export const QueryMode = {
+  default: "default",
+  insensitive: "insensitive",
+} as const;
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode];
