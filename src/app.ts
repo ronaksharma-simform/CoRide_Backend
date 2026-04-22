@@ -6,7 +6,7 @@ const app = express();
 // enables cors
 // app.use(cors());
 // testing route
-app.get("/temp", (req, res) => {
+app.get("/temp", (_, res) => {
   res.json("Working");
 });
 
