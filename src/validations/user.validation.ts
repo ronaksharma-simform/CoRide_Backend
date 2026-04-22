@@ -19,4 +19,6 @@ const User = z.object({
 
   created_at: z.date().optional(), // auto-set
 });
+type UserType = z.infer<typeof User>;
+export { UserType };
 export default User;
