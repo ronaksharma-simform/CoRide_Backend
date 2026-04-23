@@ -563,6 +563,7 @@ export const UserScalarFieldEnum = {
   role: "role",
   gender: "gender",
   is_org_verified: "is_org_verified",
+  refreshToken: "refreshToken",
   is_id_verified: "is_id_verified",
   avg_rating: "avg_rating",
   total_rides: "total_rides",

@@ -21,6 +21,7 @@ model User {
   role            String
   gender          String
   is_org_verified Boolean  @default(false)
+  refreshToken    String   @default("")
   is_id_verified  Boolean  @default(false)
   avg_rating      Float    @default(0)
   total_rides     Int      @default(0)

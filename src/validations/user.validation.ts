@@ -11,7 +11,7 @@ const User = z.object({
   gender: z.enum(["Male", "Female"]),
 
   is_org_verified: z.boolean().optional().default(false),
-
+  accessToken: z.hash("sha256").optional().default(""),
   is_id_verified: z.boolean().optional().default(false),
   avg_rating: z.number().min(0).max(5).optional().default(0),
 

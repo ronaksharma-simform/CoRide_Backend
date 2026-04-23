@@ -46,6 +46,7 @@ export type UserMinAggregateOutputType = {
   role: string | null;
   gender: string | null;
   is_org_verified: boolean | null;
+  refreshToken: string | null;
   is_id_verified: boolean | null;
   avg_rating: number | null;
   total_rides: number | null;
@@ -62,6 +63,7 @@ export type UserMaxAggregateOutputType = {
   role: string | null;
   gender: string | null;
   is_org_verified: boolean | null;
+  refreshToken: string | null;
   is_id_verified: boolean | null;
   avg_rating: number | null;
   total_rides: number | null;
@@ -78,6 +80,7 @@ export type UserCountAggregateOutputType = {
   role: number;
   gender: number;
   is_org_verified: number;
+  refreshToken: number;
   is_id_verified: number;
   avg_rating: number;
   total_rides: number;
@@ -105,6 +108,7 @@ export type UserMinAggregateInputType = {
   role?: true;
   gender?: true;
   is_org_verified?: true;
+  refreshToken?: true;
   is_id_verified?: true;
   avg_rating?: true;
   total_rides?: true;
@@ -121,6 +125,7 @@ export type UserMaxAggregateInputType = {
   role?: true;
   gender?: true;
   is_org_verified?: true;
+  refreshToken?: true;
   is_id_verified?: true;
   avg_rating?: true;
   total_rides?: true;
@@ -137,6 +142,7 @@ export type UserCountAggregateInputType = {
   role?: true;
   gender?: true;
   is_org_verified?: true;
+  refreshToken?: true;
   is_id_verified?: true;
   avg_rating?: true;
   total_rides?: true;
@@ -247,6 +253,7 @@ export type UserGroupByOutputType = {
   role: string;
   gender: string;
   is_org_verified: boolean;
+  refreshToken: string;
   is_id_verified: boolean;
   avg_rating: number;
   total_rides: number;
@@ -284,6 +291,7 @@ export type UserWhereInput = {
   role?: Prisma.StringFilter<"User"> | string;
   gender?: Prisma.StringFilter<"User"> | string;
   is_org_verified?: Prisma.BoolFilter<"User"> | boolean;
+  refreshToken?: Prisma.StringFilter<"User"> | string;
   is_id_verified?: Prisma.BoolFilter<"User"> | boolean;
   avg_rating?: Prisma.FloatFilter<"User"> | number;
   total_rides?: Prisma.IntFilter<"User"> | number;
@@ -300,6 +308,7 @@ export type UserOrderByWithRelationInput = {
   role?: Prisma.SortOrder;
   gender?: Prisma.SortOrder;
   is_org_verified?: Prisma.SortOrder;
+  refreshToken?: Prisma.SortOrder;
   is_id_verified?: Prisma.SortOrder;
   avg_rating?: Prisma.SortOrder;
   total_rides?: Prisma.SortOrder;
@@ -320,6 +329,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<
     role?: Prisma.StringFilter<"User"> | string;
     gender?: Prisma.StringFilter<"User"> | string;
     is_org_verified?: Prisma.BoolFilter<"User"> | boolean;
+    refreshToken?: Prisma.StringFilter<"User"> | string;
     is_id_verified?: Prisma.BoolFilter<"User"> | boolean;
     avg_rating?: Prisma.FloatFilter<"User"> | number;
     total_rides?: Prisma.IntFilter<"User"> | number;
@@ -338,6 +348,7 @@ export type UserOrderByWithAggregationInput = {
   role?: Prisma.SortOrder;
   gender?: Prisma.SortOrder;
   is_org_verified?: Prisma.SortOrder;
+  refreshToken?: Prisma.SortOrder;
   is_id_verified?: Prisma.SortOrder;
   avg_rating?: Prisma.SortOrder;
   total_rides?: Prisma.SortOrder;
@@ -366,6 +377,7 @@ export type UserScalarWhereWithAggregatesInput = {
   role?: Prisma.StringWithAggregatesFilter<"User"> | string;
   gender?: Prisma.StringWithAggregatesFilter<"User"> | string;
   is_org_verified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean;
+  refreshToken?: Prisma.StringWithAggregatesFilter<"User"> | string;
   is_id_verified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean;
   avg_rating?: Prisma.FloatWithAggregatesFilter<"User"> | number;
   total_rides?: Prisma.IntWithAggregatesFilter<"User"> | number;
@@ -382,6 +394,7 @@ export type UserCreateInput = {
   role: string;
   gender: string;
   is_org_verified?: boolean;
+  refreshToken?: string;
   is_id_verified?: boolean;
   avg_rating?: number;
   total_rides?: number;
@@ -398,6 +411,7 @@ export type UserUncheckedCreateInput = {
   role: string;
   gender: string;
   is_org_verified?: boolean;
+  refreshToken?: string;
   is_id_verified?: boolean;
   avg_rating?: number;
   total_rides?: number;
@@ -414,6 +428,7 @@ export type UserUpdateInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string;
   gender?: Prisma.StringFieldUpdateOperationsInput | string;
   is_org_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+  refreshToken?: Prisma.StringFieldUpdateOperationsInput | string;
   is_id_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   avg_rating?: Prisma.FloatFieldUpdateOperationsInput | number;
   total_rides?: Prisma.IntFieldUpdateOperationsInput | number;
@@ -430,6 +445,7 @@ export type UserUncheckedUpdateInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string;
   gender?: Prisma.StringFieldUpdateOperationsInput | string;
   is_org_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+  refreshToken?: Prisma.StringFieldUpdateOperationsInput | string;
   is_id_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   avg_rating?: Prisma.FloatFieldUpdateOperationsInput | number;
   total_rides?: Prisma.IntFieldUpdateOperationsInput | number;
@@ -446,6 +462,7 @@ export type UserCreateManyInput = {
   role: string;
   gender: string;
   is_org_verified?: boolean;
+  refreshToken?: string;
   is_id_verified?: boolean;
   avg_rating?: number;
   total_rides?: number;
@@ -462,6 +479,7 @@ export type UserUpdateManyMutationInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string;
   gender?: Prisma.StringFieldUpdateOperationsInput | string;
   is_org_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+  refreshToken?: Prisma.StringFieldUpdateOperationsInput | string;
   is_id_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   avg_rating?: Prisma.FloatFieldUpdateOperationsInput | number;
   total_rides?: Prisma.IntFieldUpdateOperationsInput | number;
@@ -478,6 +496,7 @@ export type UserUncheckedUpdateManyInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string;
   gender?: Prisma.StringFieldUpdateOperationsInput | string;
   is_org_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+  refreshToken?: Prisma.StringFieldUpdateOperationsInput | string;
   is_id_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   avg_rating?: Prisma.FloatFieldUpdateOperationsInput | number;
   total_rides?: Prisma.IntFieldUpdateOperationsInput | number;
@@ -494,6 +513,7 @@ export type UserCountOrderByAggregateInput = {
   role?: Prisma.SortOrder;
   gender?: Prisma.SortOrder;
   is_org_verified?: Prisma.SortOrder;
+  refreshToken?: Prisma.SortOrder;
   is_id_verified?: Prisma.SortOrder;
   avg_rating?: Prisma.SortOrder;
   total_rides?: Prisma.SortOrder;
@@ -515,6 +535,7 @@ export type UserMaxOrderByAggregateInput = {
   role?: Prisma.SortOrder;
   gender?: Prisma.SortOrder;
   is_org_verified?: Prisma.SortOrder;
+  refreshToken?: Prisma.SortOrder;
   is_id_verified?: Prisma.SortOrder;
   avg_rating?: Prisma.SortOrder;
   total_rides?: Prisma.SortOrder;
@@ -531,6 +552,7 @@ export type UserMinOrderByAggregateInput = {
   role?: Prisma.SortOrder;
   gender?: Prisma.SortOrder;
   is_org_verified?: Prisma.SortOrder;
+  refreshToken?: Prisma.SortOrder;
   is_id_verified?: Prisma.SortOrder;
   avg_rating?: Prisma.SortOrder;
   total_rides?: Prisma.SortOrder;
@@ -584,6 +606,7 @@ export type UserSelect<
     role?: boolean;
     gender?: boolean;
     is_org_verified?: boolean;
+    refreshToken?: boolean;
     is_id_verified?: boolean;
     avg_rating?: boolean;
     total_rides?: boolean;
@@ -606,6 +629,7 @@ export type UserSelectCreateManyAndReturn<
     role?: boolean;
     gender?: boolean;
     is_org_verified?: boolean;
+    refreshToken?: boolean;
     is_id_verified?: boolean;
     avg_rating?: boolean;
     total_rides?: boolean;
@@ -628,6 +652,7 @@ export type UserSelectUpdateManyAndReturn<
     role?: boolean;
     gender?: boolean;
     is_org_verified?: boolean;
+    refreshToken?: boolean;
     is_id_verified?: boolean;
     avg_rating?: boolean;
     total_rides?: boolean;
@@ -646,6 +671,7 @@ export type UserSelectScalar = {
   role?: boolean;
   gender?: boolean;
   is_org_verified?: boolean;
+  refreshToken?: boolean;
   is_id_verified?: boolean;
   avg_rating?: boolean;
   total_rides?: boolean;
@@ -665,6 +691,7 @@ export type UserOmit<
   | "role"
   | "gender"
   | "is_org_verified"
+  | "refreshToken"
   | "is_id_verified"
   | "avg_rating"
   | "total_rides"
@@ -689,6 +716,7 @@ export type $UserPayload<
       role: string;
       gender: string;
       is_org_verified: boolean;
+      refreshToken: string;
       is_id_verified: boolean;
       avg_rating: number;
       total_rides: number;
@@ -1294,6 +1322,7 @@ export interface UserFieldRefs {
   readonly role: Prisma.FieldRef<"User", "String">;
   readonly gender: Prisma.FieldRef<"User", "String">;
   readonly is_org_verified: Prisma.FieldRef<"User", "Boolean">;
+  readonly refreshToken: Prisma.FieldRef<"User", "String">;
   readonly is_id_verified: Prisma.FieldRef<"User", "Boolean">;
   readonly avg_rating: Prisma.FieldRef<"User", "Float">;
   readonly total_rides: Prisma.FieldRef<"User", "Int">;
