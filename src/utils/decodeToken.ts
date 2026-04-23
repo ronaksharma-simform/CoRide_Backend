@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-export function decodeToken(
+export default function decodeToken(
   token: string,
   type: "Access_Token" | "Refresh_Token",
 ) {
