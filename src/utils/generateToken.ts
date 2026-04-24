@@ -6,6 +6,7 @@ export function generateAccessToken(data: ITokenData) {
   const secret: string = process.env.ACCESS_TOKEN_SECRET ?? "secret";
   // const accessTokenExpiry  = process.env.ACCESS_TOKEN_EXPIRY ?? "30m";
   const accessToken = jwt.sign(data, secret, { expiresIn: "30m" });
+  console.log(accessToken);
   return { accessToken: accessToken };
 }
 

@@ -4,6 +4,8 @@ class CustomError extends Error {
   constructor(message = "Something went wrong", statusCode = 400) {
     super(message);
     this.statusCode = statusCode;
+
+    // Error.captureStackTrace(this)
   }
 }
 export default CustomError;
