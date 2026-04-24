@@ -14,7 +14,7 @@ app.get("/temp", (_, res) => {
 });
 app.get(
   "/me",
-  authMiddleware, // 🔐 applied here
+  authMiddleware,
   asyncHandler(async (req, res) => {
     res.json({ user: req.user });
   }),
