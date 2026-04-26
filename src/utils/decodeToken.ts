@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
-import CustomError from "./customErrorClass";
+import AppError from "./customErrorClass";
+import { ERROR_CODES } from "@/errors/errorCodes";
 
 interface JwtPayload {
   id: string;
@@ -10,7 +11,7 @@ export default function decodeToken(
   type: "Access_Token" | "Refresh_Token",
 ): JwtPayload {
   if (!token || token.trim() === "") {
-    throw new CustomError("Token is required", 401);
+    throw new AppError(ERROR_CODES.AUTH_TOKEN_MISSING);
   }
 
   const secret =
@@ -19,7 +20,10 @@ export default function decodeToken(
       : process.env.REFRESH_TOKEN_SECRET;
 
   if (!secret) {
-    throw new CustomError("JWT secret not configured", 500);
+    throw new AppError(
+      ERROR_CODES.INTERNAL_SERVER_ERROR,
+      "JWT secret not configured",
+    );
   }
 
   try {
@@ -30,11 +34,14 @@ export default function decodeToken(
       return decoded as JwtPayload;
     }
 
-    throw new CustomError("Invalid token payload", 401);
+    throw new AppError(ERROR_CODES.AUTH_INVALID_TOKEN);
   } catch (err) {
     if (err instanceof Error) {
-      throw new CustomError(err.message, 401);
+      throw new AppError(ERROR_CODES.INTERNAL_SERVER_ERROR, err.message);
     }
-    throw new CustomError("Token verification failed", 401);
+    throw new AppError(
+      ERROR_CODES.INTERNAL_SERVER_ERROR,
+      "Token verification failed",
+    );
   }
 }

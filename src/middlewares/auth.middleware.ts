@@ -1,6 +1,7 @@
 import { prisma } from "@/config/prisma";
+import { ERROR_CODES } from "@/errors/errorCodes";
 import { asyncHandler } from "@/utils/asyncHandler";
-import CustomError from "@/utils/customErrorClass";
+import AppError from "@/utils/customErrorClass";
 import decodeToken from "@/utils/decodeToken";
 import { NextFunction, Request, Response } from "express";
 
@@ -9,7 +10,7 @@ const authMiddleware = asyncHandler(
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw new CustomError("Access token missing or invalid format", 401);
+      throw new AppError(ERROR_CODES.AUTH_TOKEN_MISSING);
     }
 
     // Extracting Token
