@@ -1,6 +1,10 @@
 import { prisma } from "@/config/prisma";
 import { ERROR_CODES } from "@/errors/errorCodes";
 import AppError from "@/utils/customErrorClass";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "@/utils/generateToken";
 import generateHash from "@/utils/hash";
 import User from "@/validations/user.validation";
 import { RequestHandler } from "express";
@@ -38,12 +42,15 @@ export const registration: RequestHandler = async (req, res) => {
       org_name: result.data.org_name,
       role: result.data.role,
       gender: result.data.gender,
-      refreshToken: "refreshToken",
     },
   });
+  const refreshToken = generateRefreshToken({ id: user.id });
+  const accessToken = generateAccessToken({ id: user.id });
+  //   user.refreshToken=refreshToken.refreshToken;
   res.status(201).json({
     success: true,
     message: "User registered successfully",
     data: { user },
+    accessToken: accessToken.accessToken,
   });
 };

@@ -15,5 +15,6 @@ const errorMiddleware: ErrorRequestHandler = (
     success: false,
     message: message,
   });
+  next();
 };
 export default errorMiddleware;

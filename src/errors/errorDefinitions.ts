@@ -34,6 +34,14 @@ export const ERROR_MAP: Record<
     message: "Passwords do not match",
     statusCode: 400,
   },
+  AUTH_TOKEN_MISSING: {
+    message: "Authorization token is missing",
+    statusCode: 401,
+  },
+  AUTH_INVALID_TOKEN: {
+    message: "Invalid or expired token",
+    statusCode: 401,
+  },
 
   // 👤 USER
   USER_ALREADY_EXISTS: {
