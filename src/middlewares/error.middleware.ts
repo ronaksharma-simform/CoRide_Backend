@@ -8,10 +8,12 @@ const errorMiddleware: ErrorRequestHandler = (
 ) => {
   console.log(error.stack);
 
-  res.status(error.statusCode).json({
+  const statusCode = error.statusCode || 500;
+  const message = error.message || "Something went wrong";
+
+  res.status(statusCode).json({
     success: false,
-    message: error.message || "Something went wrong",
+    message: message,
   });
-  next();
 };
 export default errorMiddleware;
