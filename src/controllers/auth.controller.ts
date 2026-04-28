@@ -19,14 +19,10 @@ export const registration: RequestHandler = async (req, res) => {
     throw new AppError(ERROR_CODES.VALIDATION_FAILED);
   }
   const userWithExistingEmail = await prisma.user.findUnique({
-    where: {
-      email: result.data.email,
-    },
+    where: { email: result.data.email },
   });
   const userWithExistingPhone = await prisma.user.findUnique({
-    where: {
-      phone: result.data.phone,
-    },
+    where: { phone: result.data.phone },
   });
   if (userWithExistingEmail || userWithExistingPhone) {
     throw new AppError(ERROR_CODES.USER_ALREADY_EXISTS);
@@ -46,7 +42,11 @@ export const registration: RequestHandler = async (req, res) => {
   });
   const refreshToken = generateRefreshToken({ id: user.id });
   const accessToken = generateAccessToken({ id: user.id });
-  //   user.refreshToken=refreshToken.refreshToken;
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { refreshToken: refreshToken.refreshToken },
+  });
+  user.refreshToken = refreshToken.refreshToken;
   res.status(201).json({
     success: true,
     message: "User registered successfully",

@@ -6,10 +6,10 @@ interface JwtPayload {
   id: string;
 }
 
-export default function decodeToken(
+const decodeToken = (
   token: string,
   type: "Access_Token" | "Refresh_Token",
-): JwtPayload {
+): JwtPayload => {
   if (!token || token.trim() === "") {
     throw new AppError(ERROR_CODES.AUTH_TOKEN_MISSING);
   }
@@ -44,4 +44,5 @@ export default function decodeToken(
       "Token verification failed",
     );
   }
-}
+};
+export default decodeToken;
