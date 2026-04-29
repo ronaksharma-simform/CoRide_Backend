@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import AppError from "./customErrorClass";
-import { ERROR_CODES } from "@/errors/errorCodes";
+import { ERROR_CODES } from "@/constants/errorCodes";
 
 interface JwtPayload {
   id: string;

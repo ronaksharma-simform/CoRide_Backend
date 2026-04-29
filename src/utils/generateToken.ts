@@ -4,9 +4,12 @@ export interface ITokenData {
 }
 export const generateAccessToken = (data: ITokenData) => {
   const secret: string = process.env.ACCESS_TOKEN_SECRET ?? "secret";
-  // const accessTokenExpiry  = process.env.ACCESS_TOKEN_EXPIRY ?? "30m";
-  const accessToken = jwt.sign(data, secret, { expiresIn: "30m" });
-  console.log(accessToken);
+  const rawExpiry = parseInt(process.env.ACCESS_TOKEN_EXPIRY ?? "");
+  const accessTokenExpiry = (isNaN(rawExpiry) ? null : rawExpiry) ?? "30m";
+  const accessToken = jwt.sign(data, secret, {
+    expiresIn: accessTokenExpiry,
+  });
+
   return { accessToken: accessToken };
 };
 

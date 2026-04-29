@@ -1,5 +1,5 @@
 import { prisma } from "@/config/prisma";
-import { ERROR_CODES } from "@/errors/errorCodes";
+import { ERROR_CODES } from "@/constants/errorCodes";
 import AppError from "@/utils/customErrorClass";
 import {
   generateAccessToken,
@@ -28,10 +28,9 @@ export const registration: RequestHandler = async (req, res) => {
     throw new AppError(ERROR_CODES.USER_ALREADY_EXISTS);
   }
   const hashedPassword = await generateHash(result.data.password);
-  console.log("Hashed Password:", hashedPassword);
   const user = await prisma.user.create({
     data: {
-      name: result.data.name,
+      name: result.data.username,
       email: result.data.email,
       phone: result.data.phone,
       password: hashedPassword,

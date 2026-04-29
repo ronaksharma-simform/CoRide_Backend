@@ -1,5 +1,5 @@
 import { prisma } from "@/config/prisma";
-import { ERROR_CODES } from "@/errors/errorCodes";
+import { ERROR_CODES } from "@/constants/errorCodes";
 import AppError from "@/utils/customErrorClass";
 import decodeToken from "@/utils/decodeToken";
 import { NextFunction, Request, Response } from "express";
@@ -17,7 +17,6 @@ const authMiddleware = async (
 
   // Extracting Token
   const token = authHeader.split(" ")[1];
-  console.log(token);
   //  verify token
   const decodedData = decodeToken(token.trim(), "Access_Token");
   const userDetails = await prisma.user.findUnique({
@@ -27,7 +26,6 @@ const authMiddleware = async (
   });
   // Attaching User details
   req.user = userDetails;
-  console.log(userDetails);
   next();
 };
 

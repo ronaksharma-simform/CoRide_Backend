@@ -1,5 +1,5 @@
-import { ErrorCode } from "@/errors/errorCodes";
-import { ERROR_MAP } from "@/errors/errorDefinitions";
+import { ErrorCode } from "@/constants/errorCodes";
+import { ERROR_MAP } from "@/constants/errorDefinitions";
 
 class AppError extends Error {
   public statusCode: number;
