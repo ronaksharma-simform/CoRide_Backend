@@ -30,7 +30,7 @@ export const registration: RequestHandler = async (req, res) => {
   const hashedPassword = await generateHash(result.data.password);
   const user = await prisma.user.create({
     data: {
-      name: result.data.username,
+      username: result.data.username,
       email: result.data.email,
       phone: result.data.phone,
       password: hashedPassword,
