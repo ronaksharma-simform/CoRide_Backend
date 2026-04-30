@@ -76,4 +76,4 @@ docker-compose.override.yml
 *.seed
 *.pid.lock
 
-/generated/prisma
+src/generated/

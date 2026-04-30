@@ -10,10 +10,9 @@
     "rootDir": "./src",
     "outDir": "./dist",
 
-    "paths": {
-      "@/*": ["./src/*"]
-    },
+    "paths": { "@/*": ["./src/*"] },
     "types": ["node"],
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     /* Strict Type Checking */
     "strict": true,
     "strictNullChecks": true,
