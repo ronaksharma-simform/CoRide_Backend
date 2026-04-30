@@ -1,13 +1,15 @@
 import jwt from "jsonwebtoken";
+import { config } from "./config";
+
 export interface ITokenData {
   id: string;
 }
 export const generateAccessToken = (
   data: ITokenData,
 ): { accessToken: string } => {
-  const secret: string = process.env.ACCESS_TOKEN_SECRET ?? "secret";
+  const secret: string = config.jwt.access.secret;
   const rawExpiry = parseInt(process.env.ACCESS_TOKEN_EXPIRY ?? "");
-  const accessTokenExpiry = (isNaN(rawExpiry) ? null : rawExpiry) ?? "30m";
+  const accessTokenExpiry = isNaN(rawExpiry) ? "30m" : rawExpiry;
   const accessToken = jwt.sign(data, secret, {
     expiresIn: accessTokenExpiry,
   });

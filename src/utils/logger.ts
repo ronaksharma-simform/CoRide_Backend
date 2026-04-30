@@ -1,9 +1,10 @@
 import pino from "pino";
+import { config } from "./config";
 
-const isProd = process.env.NODE_ENV === "production";
+const isProd = config.app.env === "production";
 
 const options: pino.LoggerOptions = {
-  level: process.env.LOG_LEVEL || (isProd ? "info" : "debug"),
+  level: config.app.logLevel,
 
   base: {
     service: "backend-service",

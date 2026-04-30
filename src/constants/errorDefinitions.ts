@@ -93,7 +93,7 @@ export const ERROR_MAP: Record<
 
   // ⚙️ SYSTEM
   INTERNAL_SERVER_ERROR: {
-    message: "Something went wrong",
+    message: "Internal Server Error",
     statusCode: HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
   },
   DATABASE_ERROR: {

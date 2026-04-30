@@ -1,3 +1,4 @@
+import ms, { StringValue } from "ms";
 import { z } from "zod";
 
 const envSchema = z.object({
@@ -48,7 +49,21 @@ const envSchema = z.object({
       16,
       "ACCESS_TOKEN_SECRET is required and should be longer than 16 characters",
     ),
-  ACCESS_TOKEN_EXPIRY: z.string().default("1d"),
+  ACCESS_TOKEN_EXPIRY: z
+    .string()
+    .default("1d")
+    .refine(
+      (val) => {
+        try {
+          return typeof ms(val as StringValue) === "number";
+        } catch {
+          return false;
+        }
+      },
+      {
+        message: "Invalid time format. Use values like '30m', '1h', '7d'",
+      },
+    ),
 
   REFRESH_TOKEN_SECRET: z
     .string()
@@ -56,7 +71,21 @@ const envSchema = z.object({
       16,
       "REFRESH_TOKEN_SECRET is required and should be longer than 16 characters",
     ),
-  REFRESH_TOKEN_EXPIRY: z.string().default("7d"),
+  REFRESH_TOKEN_EXPIRY: z
+    .string()
+    .default("7d")
+    .refine(
+      (val) => {
+        try {
+          return typeof ms(val as StringValue) === "number";
+        } catch {
+          return false;
+        }
+      },
+      {
+        message: "Invalid time format. Use values like '30m', '1h', '7d'",
+      },
+    ),
 
   // VERIFICATION_TOKEN_SECRET: z
   // 	.string()
@@ -64,7 +93,15 @@ const envSchema = z.object({
   // 		16,
   // 		"VERIFICATION_TOKEN_SECRET is required and should be longer than 16 characters",
   // 	),
-  // VERIFICATION_TOKEN_EXPIRY: z.string().default("5m"),
+  // VERIFICATION_TOKEN_EXPIRY: z.string().default("5m").refine((val) => {
+  //   try {
+  //     return typeof ms(val as StringValue) === "number";
+  //   } catch {
+  //     return false;
+  //   }
+  // }, {
+  //   message: "Invalid time format. Use values like '30m', '1h', '7d'",
+  // }),
   // VERIFICATION_BASE_URL: z.url(),
   LOG_LEVEL: z.enum(["debug", "info"]),
   // EMAIL_USER: z.email(),
@@ -84,16 +121,16 @@ if (!parsedEnv.success) {
 const env = parsedEnv.data;
 
 export const config = {
-  app: { env: env.NODE_ENV, port: env.PORT },
+  app: { env: env.NODE_ENV, port: env.PORT, logLevel: env.LOG_LEVEL },
 
   jwt: {
     access: {
       secret: env.ACCESS_TOKEN_SECRET,
-      expiry: env.ACCESS_TOKEN_EXPIRY,
+      expiry: env.ACCESS_TOKEN_EXPIRY as StringValue,
     },
     refresh: {
       secret: env.REFRESH_TOKEN_SECRET,
-      expiry: env.REFRESH_TOKEN_EXPIRY,
+      expiry: env.REFRESH_TOKEN_EXPIRY as StringValue,
     },
     // verification: {
     // 	secret: env.VERIFICATION_TOKEN_SECRET,
