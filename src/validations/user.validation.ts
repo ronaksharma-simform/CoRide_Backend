@@ -18,7 +18,22 @@ export const User = z.object({
     .email("Invalid email")
     .transform((val) => val.toLowerCase()),
 
-  password: z.string().min(8, "Password must be at least 8 characters").max(20),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(20)
+    .refine((val) => /[A-Z]/.test(val), {
+      message: "Must contain at least one uppercase letter",
+    })
+    .refine((val) => /[a-z]/.test(val), {
+      message: "Must contain at least one lowercase letter",
+    })
+    .refine((val) => /[0-9]/.test(val), {
+      message: "Must contain at least one number",
+    })
+    .refine((val) => /[!@#$%^&*(),.?":{}|<>]/.test(val), {
+      message: "Must contain at least one special character",
+    }),
   phone: z.string().regex(/^[6-9]\d{9}$/, "Invalid Indian phone number"),
 
   org_name: z.string(),

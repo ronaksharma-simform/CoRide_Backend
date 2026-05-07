@@ -1,6 +1,7 @@
 import { ERROR_CODES } from "@/constants/errorCodes";
-// import { AuthService } from "@/services/auth.services";
+import { AuthService } from "@/services/auth.services";
 import AppError from "@/utils/customErrorClass";
+// import { logger } from "@/utils/logger";
 import User from "@/validations/user.validation";
 import { RequestHandler } from "express";
 
@@ -13,11 +14,11 @@ export const registration: RequestHandler = async (req, res) => {
   if (!result.success) {
     throw new AppError(ERROR_CODES.VALIDATION_FAILED);
   }
-  // const responseData = AuthService.register(result.data);
+  const responseData = await AuthService.register(result.data);
   res.status(201).json({
     success: true,
     message: "User registered successfully",
-    // data: ,
-    accessToken: accessToken.accessToken,
+    data: responseData.userData,
+    accessToken: responseData.accessToken,
   });
 };
