@@ -12,13 +12,9 @@ interface TokenPayload {
 }
 export const generateToken = (
   data: ITokenData,
-  type: "access" | "refresh",
+  type: "access" | "refresh" | "verification",
 ): { token: string } => {
-  const isAccess = type === "access";
-
-  const secret = isAccess
-    ? config.jwt.access.secret
-    : config.jwt.refresh.secret;
+  const secret = config.jwt[type].secret;
 
   if (!secret) {
     throw new AppError(
@@ -27,10 +23,7 @@ export const generateToken = (
     );
   }
 
-  const expiresIn: SignOptions["expiresIn"] = isAccess
-    ? config.jwt.access.expiry
-    : config.jwt.refresh.expiry;
-
+  const expiresIn: SignOptions["expiresIn"] = config.jwt[type].expiry;
   const token = jwt.sign(data, secret, { expiresIn });
 
   return { token };
@@ -38,7 +31,7 @@ export const generateToken = (
 
 export const decodeToken = (
   token: string,
-  type: "access" | "refresh",
+  type: "access" | "refresh" | "verification",
 ): TokenPayload => {
   if (!token || token.trim() === "") {
     throw new AppError(ERROR_CODES.AUTH_TOKEN_MISSING);

@@ -2,10 +2,11 @@ import { prisma } from "@/config/prisma";
 import { ERROR_CODES } from "@/constants/errorCodes";
 import { User } from "@/generated/prisma/client";
 import AppError from "@/utils/customErrorClass";
-import generateHash from "@/utils/hash";
+import generateHash, { generateHashToken } from "@/utils/hash";
 import { generateToken } from "@/utils/jwt.utils";
 import { TUser } from "@/validations/user.validation";
 import { v4 as uuidv4 } from "uuid";
+
 export class AuthService {
   static register = async (
     userRegistrationData: TUser,
@@ -42,5 +43,37 @@ export class AuthService {
       },
     });
     return { userData: user, accessToken: accessToken.token };
+  };
+
+  static generateVerficationToken = async (userId: string): Promise<string> => {
+    const verificationToken = generateHashToken();
+    await prisma.verificationToken.create({
+      data: {
+        id: uuidv4(),
+        userId: userId,
+        token: verificationToken.hashedToken,
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+      },
+    });
+    return verificationToken.hashedToken;
+  };
+  static verifyEmail = async (token: string): Promise<void> => {
+    const data = await prisma.verificationToken.findFirst({
+      where: { token: token },
+    });
+    if (!data) {
+      throw new AppError("INVALID_VERIFICATION_TOKEN");
+    }
+    if (!data.expiresAt || data.expiresAt < new Date()) {
+      throw new AppError("INVALID_VERIFICATION_TOKEN");
+    }
+    await prisma.user.update({
+      where: {
+        id: data.userId,
+      },
+      data: {
+        is_id_verified: true,
+      },
+    });
   };
 }

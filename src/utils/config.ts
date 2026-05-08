@@ -87,22 +87,28 @@ const envSchema = z.object({
       },
     ),
 
-  // VERIFICATION_TOKEN_SECRET: z
-  // 	.string()
-  // 	.min(
-  // 		16,
-  // 		"VERIFICATION_TOKEN_SECRET is required and should be longer than 16 characters",
-  // 	),
-  // VERIFICATION_TOKEN_EXPIRY: z.string().default("5m").refine((val) => {
-  //   try {
-  //     return typeof ms(val as StringValue) === "number";
-  //   } catch {
-  //     return false;
-  //   }
-  // }, {
-  //   message: "Invalid time format. Use values like '30m', '1h', '7d'",
-  // }),
-  // VERIFICATION_BASE_URL: z.url(),
+  VERIFICATION_TOKEN_SECRET: z
+    .string()
+    .min(
+      16,
+      "VERIFICATION_TOKEN_SECRET is required and should be longer than 16 characters",
+    ),
+  VERIFICATION_TOKEN_EXPIRY: z
+    .string()
+    .default("30m")
+    .refine(
+      (val) => {
+        try {
+          return typeof ms(val as StringValue) === "number";
+        } catch {
+          return false;
+        }
+      },
+      {
+        message: "Invalid time format. Use values like '30m', '1h', '7d'",
+      },
+    ),
+  VERIFICATION_BASE_URL: z.url(),
   LOG_LEVEL: z.enum(["debug", "info"]),
   EMAIL_USER: z.email(),
   EMAIL_PASSWORD: z.string(),
@@ -132,11 +138,11 @@ export const config = {
       secret: env.REFRESH_TOKEN_SECRET,
       expiry: env.REFRESH_TOKEN_EXPIRY as StringValue,
     },
-    // verification: {
-    // 	secret: env.VERIFICATION_TOKEN_SECRET,
-    // 	expiry: env.VERIFICATION_TOKEN_EXPIRY,
-    // 	baseUrl: env.VERIFICATION_BASE_URL,
-    // },
+    verification: {
+      secret: env.VERIFICATION_TOKEN_SECRET,
+      expiry: env.VERIFICATION_TOKEN_EXPIRY as StringValue,
+      baseUrl: env.VERIFICATION_BASE_URL,
+    },
   },
   db: { url: env.DATABASE_URL },
   email: { user: env.EMAIL_USER, password: env.EMAIL_PASSWORD },
