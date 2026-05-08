@@ -12,7 +12,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/auth", authRoutes);
-app.get("/health", (_, res) => {
+app.get("/health", async (_, res) => {
   res.json("Working");
 });
 // app.use(authMiddleware);

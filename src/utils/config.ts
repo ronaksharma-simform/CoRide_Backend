@@ -139,5 +139,5 @@ export const config = {
     // },
   },
   db: { url: env.DATABASE_URL },
-  // email: { user: env.EMAIL_USER, password: env.EMAIL_PASSWORD },
+  email: { user: env.EMAIL_USER, password: env.EMAIL_PASSWORD },
 } as const;
