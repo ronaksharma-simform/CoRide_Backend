@@ -4,21 +4,21 @@ import { User } from "@/generated/prisma/client";
 import AppError from "@/utils/customErrorClass";
 import generateHash from "@/utils/hash";
 import { generateToken } from "@/utils/jwt.utils";
+import { TUser } from "@/validations/user.validation";
 import { v4 as uuidv4 } from "uuid";
 export class AuthService {
   static register = async (
-    userRegistrationData: User,
+    userRegistrationData: TUser,
   ): Promise<{ userData: User; accessToken: string }> => {
-    const userWithExistingEmail = await prisma.user.findUnique({
-      where: { email: userRegistrationData.email },
+    const userWithExistingEmailOrPhone = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: userRegistrationData.email },
+          { phone: userRegistrationData.phone },
+        ],
+      },
     });
-    if (userWithExistingEmail) {
-      throw new AppError(ERROR_CODES.USER_ALREADY_EXISTS);
-    }
-    const userWithExistingPhone = await prisma.user.findUnique({
-      where: { phone: userRegistrationData.phone },
-    });
-    if (userWithExistingPhone) {
+    if (userWithExistingEmailOrPhone) {
       throw new AppError(ERROR_CODES.USER_ALREADY_EXISTS);
     }
     const hashedPassword = await generateHash(userRegistrationData.password);
@@ -41,10 +41,6 @@ export class AuthService {
         refreshToken: refreshToken.token,
       },
     });
-    user.refreshToken = refreshToken.token;
-    return {
-      userData: user,
-      accessToken: accessToken.token,
-    };
+    return { userData: user, accessToken: accessToken.token };
   };
 }

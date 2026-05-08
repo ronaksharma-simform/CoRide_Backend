@@ -22,17 +22,34 @@ export const User = z.object({
     .string()
     .min(8, "Password must be at least 8 characters")
     .max(20)
-    .refine((val) => /[A-Z]/.test(val), {
-      message: "Must contain at least one uppercase letter",
-    })
-    .refine((val) => /[a-z]/.test(val), {
-      message: "Must contain at least one lowercase letter",
-    })
-    .refine((val) => /[0-9]/.test(val), {
-      message: "Must contain at least one number",
-    })
-    .refine((val) => /[!@#$%^&*(),.?":{}|<>]/.test(val), {
-      message: "Must contain at least one special character",
+    .superRefine((val, ctx) => {
+      let hasUpper = false;
+      let hasLower = false;
+      let hasNumber = false;
+      let hasSpecial = false;
+
+      for (const ch of val) {
+        if (/[A-Z]/.test(ch)) hasUpper = true;
+        else if (/[a-z]/.test(ch)) hasLower = true;
+        else if (/[0-9]/.test(ch)) hasNumber = true;
+        else hasSpecial = true;
+      }
+
+      if (!hasUpper) {
+        ctx.addIssue("Must contain uppercase");
+      }
+
+      if (!hasLower) {
+        ctx.addIssue("Must contain lowercase");
+      }
+
+      if (!hasNumber) {
+        ctx.addIssue("Must contain number");
+      }
+
+      if (!hasSpecial) {
+        ctx.addIssue("Must contain special character");
+      }
     }),
   phone: z.string().regex(/^[6-9]\d{9}$/, "Invalid Indian phone number"),
 
@@ -46,6 +63,20 @@ export const User = z.object({
   total_rides: z.number().optional(),
   created_at: z.date().optional(),
 });
+
+export const UserReqBodySchema = User.pick({
+  username: true,
+  first_name: true,
+  middle_name: true,
+  last_name: true,
+  email: true,
+  password: true,
+  phone: true,
+  org_name: true,
+  gender: true,
+  role: true,
+});
 type TUser = z.infer<typeof User>;
-export { TUser };
-export default User;
+type TUserReqBodySchema = z.infer<typeof UserReqBodySchema>;
+
+export { TUser, TUserReqBodySchema };

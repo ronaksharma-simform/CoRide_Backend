@@ -104,8 +104,8 @@ const envSchema = z.object({
   // }),
   // VERIFICATION_BASE_URL: z.url(),
   LOG_LEVEL: z.enum(["debug", "info"]),
-  // EMAIL_USER: z.email(),
-  // EMAIL_PASSWORD: z.string(),
+  EMAIL_USER: z.email(),
+  EMAIL_PASSWORD: z.string(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
