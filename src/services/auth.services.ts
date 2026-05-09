@@ -4,13 +4,13 @@ import { User } from "@/generated/prisma/client";
 import AppError from "@/utils/customErrorClass";
 import generateHash, { generateHashToken } from "@/utils/hash";
 import { generateToken } from "@/utils/jwt.utils";
-import { TUser } from "@/validations/user.validation";
+import { TUser, TUserLoginSchema } from "@/validations/user.validation";
 import { v4 as uuidv4 } from "uuid";
-
+import bcrypt from "bcrypt";
 export class AuthService {
-  static register = async (
+  static registerUser = async (
     userRegistrationData: TUser,
-  ): Promise<{ userData: User; accessToken: string }> => {
+  ): Promise<{ userData: User }> => {
     const userWithExistingEmailOrPhone = await prisma.user.findFirst({
       where: {
         OR: [
@@ -25,7 +25,6 @@ export class AuthService {
     const hashedPassword = await generateHash(userRegistrationData.password);
     const generateUserId = uuidv4();
     const refreshToken = generateToken({ id: generateUserId }, "refresh");
-    const accessToken = generateToken({ id: generateUserId }, "access");
     const user = await prisma.user.create({
       data: {
         id: generateUserId,
@@ -42,7 +41,7 @@ export class AuthService {
         refreshToken: refreshToken.token,
       },
     });
-    return { userData: user, accessToken: accessToken.token };
+    return { userData: user };
   };
 
   static generateVerficationToken = async (userId: string): Promise<string> => {
@@ -75,5 +74,33 @@ export class AuthService {
         is_id_verified: true,
       },
     });
+  };
+  static loginUser = async (
+    userLoginData: TUserLoginSchema,
+  ): Promise<{ accessToken: string; userData: User }> => {
+    const userWithEmail = await prisma.user.findUnique({
+      where: {
+        email: userLoginData.email,
+      },
+    });
+    if (!userWithEmail) {
+      throw new AppError("AUTH_USER_NOT_FOUND");
+    }
+    const isPasswordValid = await bcrypt.compare(
+      userLoginData.password,
+      userWithEmail.password,
+    );
+    if (!isPasswordValid) {
+      throw new AppError("AUTH_INVALID_PASSWORD");
+    }
+
+    if (!userWithEmail.is_id_verified) {
+      throw new AppError("AUTH_ACCOUNT_NOT_VERIFIED");
+    }
+    const accessToken = generateToken({ id: userWithEmail.id }, "access");
+    return {
+      accessToken: accessToken.token,
+      userData: userWithEmail,
+    };
   };
 }

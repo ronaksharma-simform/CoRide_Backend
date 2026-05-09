@@ -64,7 +64,7 @@ export const User = z.object({
   created_at: z.date().optional(),
 });
 
-export const UserReqBodySchema = User.pick({
+export const UserRegistrationSchema = User.pick({
   username: true,
   first_name: true,
   middle_name: true,
@@ -76,7 +76,11 @@ export const UserReqBodySchema = User.pick({
   gender: true,
   role: true,
 });
+export const UserLoginSchema = User.pick({
+  email: true,
+  password: true,
+});
 type TUser = z.infer<typeof User>;
-type TUserReqBodySchema = z.infer<typeof UserReqBodySchema>;
-
-export { TUser, TUserReqBodySchema };
+type TUserRegistrationSchema = z.infer<typeof UserRegistrationSchema>;
+type TUserLoginSchema = z.infer<typeof UserLoginSchema>;
+export { TUser, TUserRegistrationSchema, TUserLoginSchema };

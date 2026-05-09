@@ -52,6 +52,31 @@ export const ERROR_MAP: Record<
     statusCode: HTTP_STATUS_CODES.UNAUTHORIZED,
   },
 
+  AUTH_USER_NOT_FOUND: {
+    message: "User not found",
+    statusCode: HTTP_STATUS_CODES.UNAUTHORIZED,
+  },
+
+  AUTH_INVALID_PASSWORD: {
+    message: "Invalid password",
+    statusCode: HTTP_STATUS_CODES.UNAUTHORIZED,
+  },
+
+  AUTH_ACCOUNT_NOT_VERIFIED: {
+    message: "Account not verified",
+    statusCode: HTTP_STATUS_CODES.UNAUTHORIZED,
+  },
+
+  AUTH_ACCOUNT_LOCKED: {
+    message: "Account is locked",
+    statusCode: HTTP_STATUS_CODES.UNAUTHORIZED,
+  },
+
+  AUTH_TOO_MANY_ATTEMPTS: {
+    message: "Too many failed login attempts",
+    statusCode: HTTP_STATUS_CODES.UNAUTHORIZED,
+  },
+
   // 👤 USER
   USER_ALREADY_EXISTS: {
     message: "User account already exists",
