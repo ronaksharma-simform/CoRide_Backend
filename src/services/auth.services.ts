@@ -3,7 +3,7 @@ import { ERROR_CODES } from "@/constants/errorCodes";
 import { User } from "@/generated/prisma/client";
 import AppError from "@/utils/customErrorClass";
 import generateHash, { generateHashToken } from "@/utils/hash";
-import { generateToken } from "@/utils/jwt.utils";
+import { decodeToken, generateToken } from "@/utils/jwt.utils";
 import { TUser, TUserLoginSchema } from "@/validations/user.validation";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
@@ -98,9 +98,56 @@ export class AuthService {
       throw new AppError("AUTH_ACCOUNT_NOT_VERIFIED");
     }
     const accessToken = generateToken({ id: userWithEmail.id }, "access");
+    if (userWithEmail.refreshToken === "") {
+      const refreshToken = generateToken({ id: userWithEmail.id }, "refresh");
+      await prisma.user.update({
+        where: {
+          id: userWithEmail.id,
+        },
+        data: {
+          refreshToken: refreshToken.token,
+        },
+      });
+    }
     return {
       accessToken: accessToken.token,
       userData: userWithEmail,
     };
+  };
+  static refreshToken = async (
+    refreshToken: string,
+  ): Promise<{ accessToken: string }> => {
+    const decodedData = decodeToken(refreshToken, "refresh");
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decodedData.id,
+      },
+    });
+    if (!user || user.refreshToken !== refreshToken) {
+      throw new AppError("AUTH_INVALID_TOKEN");
+    }
+    const newAccessToken = generateToken({ id: user.id }, "access");
+    return {
+      accessToken: newAccessToken.token,
+    };
+  };
+  static logout = async (refreshToken: string): Promise<void> => {
+    const decodedData = decodeToken(refreshToken, "refresh");
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decodedData.id,
+      },
+    });
+    if (!user || user.refreshToken !== refreshToken) {
+      throw new AppError("AUTH_INVALID_TOKEN");
+    }
+    await prisma.user.update({
+      where: {
+        id: decodedData.id,
+      },
+      data: {
+        refreshToken: "",
+      },
+    });
   };
 }

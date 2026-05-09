@@ -1,6 +1,8 @@
 import { Router } from "express";
 import {
   login,
+  logout,
+  refreshToken,
   registration,
   verifyEmail,
 } from "@/controllers/auth.controller";
@@ -19,4 +21,6 @@ route.post(
 );
 route.get("/verify-email", asyncHandler(verifyEmail));
 route.post("/login", validateSchema(UserLoginSchema), asyncHandler(login));
+route.post("/refresh-token", asyncHandler(refreshToken));
+route.post("/logout", asyncHandler(logout));
 export default route;
