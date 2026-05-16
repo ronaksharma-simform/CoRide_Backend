@@ -14,16 +14,16 @@ import { RequestHandler } from "express";
 const toUserResponse = (user: User): TUserResponseSchema => {
   return UserResponseSchema.parse({
     username: user.username,
-    first_name: user.first_name,
-    middle_name: user.middle_name,
-    last_name: user.last_name,
+    firstName: user.firstName,
+    middleName: user.middleName,
+    lastName: user.lastName,
     email: user.email,
     phone: user.phone,
     role: user.role,
     gender: user.gender,
-    avg_rating: user.avg_rating,
-    total_rides: user.total_rides,
-    created_at: user.created_at,
+    avg_rating: user.avgRating,
+    total_rides: user.totalRides,
+    created_at: user.createdAt,
   });
 };
 export const registration: RequestHandler = async (req, res) => {

@@ -6,13 +6,17 @@ import { ERROR_CODES } from "@/constants/errorCodes";
 export interface ITokenData {
   id: string;
 }
+export enum TokenTypes {
+  Access = "access",
+  Refresh = "refresh",
+}
 
 interface TokenPayload {
   id: string;
 }
 export const generateToken = (
   data: ITokenData,
-  type: "access" | "refresh" | "verification",
+  type: TokenTypes,
 ): { token: string } => {
   const secret = config.jwt[type].secret;
 
@@ -29,16 +33,15 @@ export const generateToken = (
   return { token };
 };
 
-export const decodeToken = (
-  token: string,
-  type: "access" | "refresh" | "verification",
-): TokenPayload => {
+export const decodeToken = (token: string, type: TokenTypes): TokenPayload => {
   if (!token || token.trim() === "") {
     throw new AppError(ERROR_CODES.AUTH_TOKEN_MISSING);
   }
 
   const secret =
-    type === "access" ? config.jwt.access.secret : config.jwt.refresh.secret;
+    type === TokenTypes.Access
+      ? config.jwt.access.secret
+      : config.jwt.refresh.secret;
 
   if (!secret) {
     throw new AppError(

@@ -3,10 +3,12 @@ import { ERROR_CODES } from "@/constants/errorCodes";
 import { User } from "@/generated/prisma/client";
 import AppError from "@/utils/customErrorClass";
 import generateHash, { generateHashToken } from "@/utils/hash";
-import { decodeToken, generateToken } from "@/utils/jwt.utils";
+import { decodeToken, generateToken, TokenTypes } from "@/utils/jwt.utils";
 import { TUser, TUserLoginSchema } from "@/validations/user.validation";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
+import { config } from "@/utils/config";
+
 export class AuthService {
   static registerUser = async (
     userRegistrationData: TUser,
@@ -24,20 +26,24 @@ export class AuthService {
     }
     const hashedPassword = await generateHash(userRegistrationData.password);
     const generateUserId = uuidv4();
-    const refreshToken = generateToken({ id: generateUserId }, "refresh");
+    const refreshToken = generateToken(
+      { id: generateUserId },
+      TokenTypes.Refresh,
+    );
     const user = await prisma.user.create({
       data: {
         id: generateUserId,
         username: userRegistrationData.username,
-        first_name: userRegistrationData.first_name,
-        last_name: userRegistrationData.last_name,
-        middle_name: userRegistrationData.middle_name,
+        firstName: userRegistrationData.firstName,
+        lastName: userRegistrationData.lastName,
+        middleName: userRegistrationData.middleName,
         email: userRegistrationData.email,
         phone: userRegistrationData.phone,
         password: hashedPassword,
-        org_name: userRegistrationData.org_name,
+        orgName: userRegistrationData.orgName,
         role: userRegistrationData.role,
         gender: userRegistrationData.gender,
+        isIdVerified: false,
         refreshToken: refreshToken.token,
       },
     });
@@ -51,7 +57,9 @@ export class AuthService {
         id: uuidv4(),
         userId: userId,
         token: verificationToken.hashedToken,
-        expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+        expiresAt: new Date(
+          Date.now() + config.jwt.verification.expiry * 60 * 1000,
+        ),
       },
     });
     return verificationToken.hashedToken;
@@ -71,7 +79,7 @@ export class AuthService {
         id: data.userId,
       },
       data: {
-        is_id_verified: true,
+        isIdVerified: true,
       },
     });
   };
@@ -94,12 +102,18 @@ export class AuthService {
       throw new AppError("AUTH_INVALID_PASSWORD");
     }
 
-    if (!userWithEmail.is_id_verified) {
+    if (!userWithEmail.isIdVerified) {
       throw new AppError("AUTH_ACCOUNT_NOT_VERIFIED");
     }
-    const accessToken = generateToken({ id: userWithEmail.id }, "access");
+    const accessToken = generateToken(
+      { id: userWithEmail.id },
+      TokenTypes.Access,
+    );
     if (userWithEmail.refreshToken === "") {
-      const refreshToken = generateToken({ id: userWithEmail.id }, "refresh");
+      const refreshToken = generateToken(
+        { id: userWithEmail.id },
+        TokenTypes.Refresh,
+      );
       await prisma.user.update({
         where: {
           id: userWithEmail.id,
@@ -117,7 +131,7 @@ export class AuthService {
   static refreshToken = async (
     refreshToken: string,
   ): Promise<{ accessToken: string }> => {
-    const decodedData = decodeToken(refreshToken, "refresh");
+    const decodedData = decodeToken(refreshToken, TokenTypes.Refresh);
     const user = await prisma.user.findUnique({
       where: {
         id: decodedData.id,
@@ -126,13 +140,13 @@ export class AuthService {
     if (!user || user.refreshToken !== refreshToken) {
       throw new AppError("AUTH_INVALID_TOKEN");
     }
-    const newAccessToken = generateToken({ id: user.id }, "access");
+    const newAccessToken = generateToken({ id: user.id }, TokenTypes.Access);
     return {
       accessToken: newAccessToken.token,
     };
   };
   static logout = async (refreshToken: string): Promise<void> => {
-    const decodedData = decodeToken(refreshToken, "refresh");
+    const decodedData = decodeToken(refreshToken, TokenTypes.Refresh);
     const user = await prisma.user.findUnique({
       where: {
         id: decodedData.id,

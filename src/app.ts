@@ -5,6 +5,7 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import authMiddleware from "./middlewares/auth.middleware";
+import { prisma } from "./config/prisma";
 const app = express();
 app.use(cors());
 app.use(helmet());
@@ -14,7 +15,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // public routes
 app.use("/auth", authRoutes);
-app.get("/health", (_, res) => res.json("Working"));
+app.get("/health", async (_, res) => {
+  res.json("Working");
+});
 
 // protected routes
 app.use("/api", authMiddleware);
