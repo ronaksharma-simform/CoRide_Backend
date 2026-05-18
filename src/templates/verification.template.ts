@@ -1,3 +1,5 @@
+import { config } from "@/utils/config";
+
 export const verificationTemplate = (
   name: string,
   verificationUrl: string,
@@ -176,7 +178,7 @@ export const verificationTemplate = (
                       line-height: 1.6;
                     "
                   >
-                    This verification link will expire in 15 minutes.
+                    This verification link will expire in ${config.jwt.verification.expiry} minutes.
                     If you did not create this account, this email can be ignored.
                   </p>
                 </td>

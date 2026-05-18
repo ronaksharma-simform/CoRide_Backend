@@ -95,17 +95,15 @@ const envSchema = z.object({
     ),
   VERIFICATION_TOKEN_EXPIRY: z
     .string()
-    .default("30m")
+    .default("60")
     .refine(
       (val) => {
-        try {
-          return typeof ms(val as StringValue) === "number";
-        } catch {
-          return false;
-        }
+        const parsed = Number(val);
+        return !Number.isNaN(parsed) && parsed > 0;
       },
       {
-        message: "Invalid time format. Use values like '30m', '1h', '7d'",
+        message:
+          "VERIFICATION_TOKEN_EXPIRY must be a positive number representing minutes",
       },
     ),
   VERIFICATION_BASE_URL: z.url(),
@@ -140,7 +138,7 @@ export const config = {
     },
     verification: {
       secret: env.VERIFICATION_TOKEN_SECRET,
-      expiry: env.VERIFICATION_TOKEN_EXPIRY as StringValue,
+      expiry: parseInt(env.VERIFICATION_TOKEN_EXPIRY),
       baseUrl: env.VERIFICATION_BASE_URL,
     },
   },

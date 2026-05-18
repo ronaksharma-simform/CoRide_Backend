@@ -7,11 +7,11 @@ export const User = z.object({
     .max(20)
     .regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, underscore allowed"),
 
-  first_name: z.string().min(1, "First name is required"),
+  firstName: z.string().min(1, "First name is required"),
 
-  middle_name: z.string().optional().default(""),
+  middleName: z.string().optional().default(""),
 
-  last_name: z.string().min(1, "Last name is required"),
+  lastName: z.string().min(1, "Last name is required"),
 
   email: z
     .string()
@@ -53,34 +53,29 @@ export const User = z.object({
     }),
   phone: z.string().regex(/^[6-9]\d{9}$/, "Invalid Indian phone number"),
 
-  org_name: z.string(),
+  orgName: z.string(),
   role: z.enum(["USER", "ADMIN"]).default("USER"),
   gender: z.enum(["MALE", "FEMALE"]),
-  is_org_verified: z.boolean().optional(),
+  isOrgVerified: z.boolean().optional(),
   refreshToken: z.string().optional(),
-  is_id_verified: z.boolean().optional(),
-  avg_rating: z.number().optional(),
-  total_rides: z.number().optional(),
-  created_at: z.date().optional(),
+  isIdVerified: z.boolean().optional(),
+  avgRating: z.number().optional(),
+  totalRides: z.number().optional(),
+  createdAt: z.date().optional(),
 });
 
 export const UserRegistrationSchema = User.pick({
   username: true,
-  first_name: true,
-  middle_name: true,
-  last_name: true,
+  firstName: true,
+  middleName: true,
+  lastName: true,
   email: true,
   password: true,
   phone: true,
-  org_name: true,
+  orgName: true,
   gender: true,
   role: true,
 });
-export const UserLoginSchema = User.pick({
-  email: true,
-  password: true,
-});
 type TUser = z.infer<typeof User>;
 type TUserRegistrationSchema = z.infer<typeof UserRegistrationSchema>;
-type TUserLoginSchema = z.infer<typeof UserLoginSchema>;
-export { TUser, TUserRegistrationSchema, TUserLoginSchema };
+export { TUser, TUserRegistrationSchema };

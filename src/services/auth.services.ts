@@ -3,10 +3,9 @@ import { ERROR_CODES } from "@/constants/errorCodes";
 import { User } from "@/generated/prisma/client";
 import AppError from "@/utils/customErrorClass";
 import generateHash, { generateHashToken } from "@/utils/hash";
-import { generateToken } from "@/utils/jwt.utils";
-import { TUser, TUserLoginSchema } from "@/validations/user.validation";
+import { generateToken, TokenType } from "@/utils/jwt.utils";
+import { TUser } from "@/validations/user.validation";
 import { v4 as uuidv4 } from "uuid";
-import bcrypt from "bcrypt";
 export class AuthService {
   static registerUser = async (
     userRegistrationData: TUser,
@@ -24,18 +23,21 @@ export class AuthService {
     }
     const hashedPassword = await generateHash(userRegistrationData.password);
     const generateUserId = uuidv4();
-    const refreshToken = generateToken({ id: generateUserId }, "refresh");
+    const refreshToken = generateToken(
+      { id: generateUserId },
+      TokenType.REFRESH,
+    );
     const user = await prisma.user.create({
       data: {
         id: generateUserId,
         username: userRegistrationData.username,
-        first_name: userRegistrationData.first_name,
-        last_name: userRegistrationData.last_name,
-        middle_name: userRegistrationData.middle_name,
+        firstName: userRegistrationData.firstName,
+        lastName: userRegistrationData.lastName,
+        middleName: userRegistrationData.middleName,
         email: userRegistrationData.email,
         phone: userRegistrationData.phone,
         password: hashedPassword,
-        org_name: userRegistrationData.org_name,
+        orgName: userRegistrationData.orgName,
         role: userRegistrationData.role,
         gender: userRegistrationData.gender,
         refreshToken: refreshToken.token,
@@ -74,33 +76,5 @@ export class AuthService {
         is_id_verified: true,
       },
     });
-  };
-  static loginUser = async (
-    userLoginData: TUserLoginSchema,
-  ): Promise<{ accessToken: string; userData: User }> => {
-    const userWithEmail = await prisma.user.findUnique({
-      where: {
-        email: userLoginData.email,
-      },
-    });
-    if (!userWithEmail) {
-      throw new AppError("AUTH_USER_NOT_FOUND");
-    }
-    const isPasswordValid = await bcrypt.compare(
-      userLoginData.password,
-      userWithEmail.password,
-    );
-    if (!isPasswordValid) {
-      throw new AppError("AUTH_INVALID_PASSWORD");
-    }
-
-    if (!userWithEmail.is_id_verified) {
-      throw new AppError("AUTH_ACCOUNT_NOT_VERIFIED");
-    }
-    const accessToken = generateToken({ id: userWithEmail.id }, "access");
-    return {
-      accessToken: accessToken.token,
-      userData: userWithEmail,
-    };
   };
 }

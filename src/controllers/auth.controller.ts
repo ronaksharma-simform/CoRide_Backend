@@ -36,14 +36,3 @@ export const verifyEmail: RequestHandler = async (req, res) => {
     .status(200)
     .json({ success: true, message: "Email verified successfully" });
 };
-
-export const login: RequestHandler = async (req, res) => {
-  const responseData = await AuthService.loginUser(req.body);
-  res.cookie("refreshToken", responseData.userData.refreshToken);
-  res.status(200).json({
-    success: true,
-    message: "Login successful",
-    data: responseData.userData,
-    accessToken: responseData.accessToken,
-  });
-};
