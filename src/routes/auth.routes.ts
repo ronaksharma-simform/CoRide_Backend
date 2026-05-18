@@ -1,8 +1,14 @@
 import { Router } from "express";
-import { registration } from "@/controllers/auth.controller";
+import { registration, verifyEmail } from "@/controllers/auth.controller";
 import { asyncHandler } from "@/utils/asyncHandler";
+import validateSchema from "@/middlewares/schema.middleware";
+import { UserRegistrationSchema } from "@/validations/user.validation";
 const route = Router();
 
-route.post("/register", asyncHandler(registration));
-
+route.post(
+  "/register",
+  validateSchema(UserRegistrationSchema),
+  asyncHandler(registration),
+);
+route.get("/verify-email", asyncHandler(verifyEmail));
 export default route;

@@ -7,27 +7,35 @@ generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
 }
-
 datasource db {
   provider = "postgresql"
 }
 model User {
-  id              String  @id @default(uuid())
-  username        String  @unique
-  first_name      String
-  middle_name     String  @default("")
-  last_name       String
+  id              String   @id @default(uuid())
+  username        String   @unique
+  firstName       String
+  middleName      String   @default("")
+  lastName        String
   email           String   @unique
   password        String
-  phone           String  @unique
-  org_name        String
+  phone           String   @unique
+  orgName         String
   role            String
   gender          String
-  is_org_verified Boolean  @default(false)
+  isOrgVerified   Boolean  @default(false)
   refreshToken    String   @default("")
-  is_id_verified  Boolean  @default(false)
-  avg_rating      Float    @default(0)
-  total_rides     Int      @default(0)
-  created_at      DateTime @default(now())
- @@index([email])
+  isIdVerified    Boolean  @default(false)
+  avgRating       Float    @default(0)
+  totalRides      Int      @default(0)
+  createdAt       DateTime @default(now())
+  @@index([email])
+}
+model VerificationToken {
+  id        String   @id @default(uuid())
+  userId    String    
+  token     String   @default("") 
+  type      String   @default("Email Verification")
+  expiresAt DateTime @default(now())
+
+  @@index([token])
 }

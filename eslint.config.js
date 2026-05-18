@@ -9,7 +9,10 @@ export default defineConfig([
     plugins: { js },
     extends: ["js/recommended"],
     languageOptions: { globals: globals.node },
-    rules: { "no-console": ["error", { allow: ["warn", "error"] }] },
+    rules: {
+      "no-console": ["error", { allow: ["warn", "error"] }],
+      "@typescript-eslint/explicit-function-return-type": "error",
+    },
   },
   {
     ignores: [
