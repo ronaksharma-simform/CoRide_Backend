@@ -7,7 +7,7 @@ import { generateToken, TokenType } from "@/utils/jwt.utils";
 import { TUser } from "@/validations/user.validation";
 import { v4 as uuidv4 } from "uuid";
 export class AuthService {
-  static registerUser = async (
+  static readonly registerUser = async (
     userRegistrationData: TUser,
   ): Promise<{ userData: User }> => {
     const userWithExistingEmailOrPhone = await prisma.user.findFirst({
@@ -46,7 +46,9 @@ export class AuthService {
     return { userData: user };
   };
 
-  static generateVerficationToken = async (userId: string): Promise<string> => {
+  static readonly generateVerficationToken = async (
+    userId: string,
+  ): Promise<string> => {
     const verificationToken = generateHashToken();
     await prisma.verificationToken.create({
       data: {
@@ -58,7 +60,7 @@ export class AuthService {
     });
     return verificationToken.hashedToken;
   };
-  static verifyEmail = async (token: string): Promise<void> => {
+  static readonly verifyEmail = async (token: string): Promise<void> => {
     const data = await prisma.verificationToken.findFirst({
       where: { token: token },
     });

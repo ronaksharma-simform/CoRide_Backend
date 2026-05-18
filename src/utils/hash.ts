@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import crypto from "crypto";
+import crypto from "node:crypto";
 const generateHash = async (data: string): Promise<string> => {
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(data, salt);

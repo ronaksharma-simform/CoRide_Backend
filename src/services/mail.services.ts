@@ -2,7 +2,7 @@ import transporter from "@/config/mail";
 import { config } from "@/utils/config";
 
 class MailService {
-  static sendMail = async (
+  static readonly sendMail = async (
     to: string,
     subject: string,
     template: string,

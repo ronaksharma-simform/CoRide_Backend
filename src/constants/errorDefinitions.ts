@@ -57,7 +57,7 @@ export const ERROR_MAP: Record<
     statusCode: HTTP_STATUS_CODES.UNAUTHORIZED,
   },
 
-  AUTH_INVALID_PASSWORD: {
+  AUTH_INVALID_CREDENTIALS: {
     message: "Invalid password",
     statusCode: HTTP_STATUS_CODES.UNAUTHORIZED,
   },

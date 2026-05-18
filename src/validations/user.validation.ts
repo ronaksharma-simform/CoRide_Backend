@@ -31,7 +31,7 @@ export const User = z.object({
       for (const ch of val) {
         if (/[A-Z]/.test(ch)) hasUpper = true;
         else if (/[a-z]/.test(ch)) hasLower = true;
-        else if (/[0-9]/.test(ch)) hasNumber = true;
+        else if (/\d/.test(ch)) hasNumber = true;
         else hasSpecial = true;
       }
 

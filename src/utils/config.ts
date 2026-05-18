@@ -138,7 +138,7 @@ export const config = {
     },
     verification: {
       secret: env.VERIFICATION_TOKEN_SECRET,
-      expiry: parseInt(env.VERIFICATION_TOKEN_EXPIRY),
+      expiry: Number.parseInt(env.VERIFICATION_TOKEN_EXPIRY),
       baseUrl: env.VERIFICATION_BASE_URL,
     },
   },
