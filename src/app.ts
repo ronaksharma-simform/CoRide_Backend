@@ -14,7 +14,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // public routes
 app.use("/auth", authRoutes);
-app.get("/health", (_, res) => res.json("Working"));
+app.get("/health", (_, res) => {
+  res.json("Working");
+});
 
 // protected routes
 app.use("/api", authMiddleware);

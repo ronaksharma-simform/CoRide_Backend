@@ -10,6 +10,7 @@ import {
   UserResponseSchema,
 } from "@/validations/user.validation";
 import { RequestHandler } from "express";
+import ms from "ms";
 
 const toUserResponse = (user: User): TUserResponseSchema => {
   return UserResponseSchema.parse({
@@ -48,9 +49,10 @@ export const registration: RequestHandler = async (req, res) => {
 export const verifyEmail: RequestHandler = async (req, res) => {
   const { token } = req.query;
   if (!token && typeof token !== "string") {
-    return res
-      .status(400)
-      .json({ success: false, message: "Verification token is required" });
+    return res.status(400).json({
+      success: false,
+      message: "Verification token is required",
+    });
   }
   await AuthService.verifyEmail(token as string);
   return res
@@ -60,7 +62,11 @@ export const verifyEmail: RequestHandler = async (req, res) => {
 
 export const login: RequestHandler = async (req, res) => {
   const responseData = await AuthService.loginUser(req.body);
-  res.cookie("refreshToken", responseData.userData.refreshToken);
+  res.cookie("refreshToken", responseData.userData.refreshToken, {
+    httpOnly: true,
+    secure: config.app.env === "production",
+    expires: new Date(Date.now() + ms(config.jwt.refresh.expiry)),
+  });
   res.status(200).json({
     success: true,
     message: "Login successful",
@@ -79,4 +85,14 @@ export const refreshToken: RequestHandler = async (req, res) => {
     message: "Access token refreshed successfully",
     accessToken: newAccessToken,
   });
+};
+
+export const logout: RequestHandler = async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    throw new AppError("AUTH_TOKEN_MISSING");
+  }
+  await AuthService.logout(refreshToken);
+  res.clearCookie("refreshToken");
+  res.status(200).json({ success: true, message: "Logged out successfully" });
 };

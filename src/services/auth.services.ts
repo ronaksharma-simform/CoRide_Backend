@@ -145,4 +145,23 @@ export class AuthService {
       accessToken: newAccessToken.token,
     };
   };
+  static logout = async (refreshToken: string): Promise<void> => {
+    const decodedData = decodeToken(refreshToken, TokenType.REFRESH);
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decodedData.id,
+      },
+    });
+    if (!user || user.refreshToken !== refreshToken) {
+      throw new AppError("AUTH_INVALID_TOKEN");
+    }
+    await prisma.user.update({
+      where: {
+        id: decodedData.id,
+      },
+      data: {
+        refreshToken: "",
+      },
+    });
+  };
 }
