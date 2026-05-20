@@ -3,11 +3,14 @@ import { ERROR_CODES } from "@/constants/errorCodes";
 import { User } from "@/generated/prisma/client";
 import AppError from "@/utils/customErrorClass";
 import generateHash, { generateHashToken } from "@/utils/hash";
-import { generateToken, TokenType } from "@/utils/jwt.utils";
-import { TUser } from "@/validations/user.validation";
+import { decodeToken, generateToken, TokenType } from "@/utils/jwt.utils";
+import { TUser, TUserLoginSchema } from "@/validations/user.validation";
 import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcrypt";
+import { config } from "@/utils/config";
+
 export class AuthService {
-  static readonly registerUser = async (
+  static registerUser = async (
     userRegistrationData: TUser,
   ): Promise<{ userData: User }> => {
     const userWithExistingEmailOrPhone = await prisma.user.findFirst({
@@ -40,27 +43,28 @@ export class AuthService {
         orgName: userRegistrationData.orgName,
         role: userRegistrationData.role,
         gender: userRegistrationData.gender,
+        isIdVerified: false,
         refreshToken: refreshToken.token,
       },
     });
     return { userData: user };
   };
 
-  static readonly generateVerficationToken = async (
-    userId: string,
-  ): Promise<string> => {
+  static generateVerficationToken = async (userId: string): Promise<string> => {
     const verificationToken = generateHashToken();
     await prisma.verificationToken.create({
       data: {
         id: uuidv4(),
         userId: userId,
         token: verificationToken.hashedToken,
-        expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+        expiresAt: new Date(
+          Date.now() + config.jwt.verification.expiry * 60 * 1000,
+        ),
       },
     });
     return verificationToken.hashedToken;
   };
-  static readonly verifyEmail = async (token: string): Promise<void> => {
+  static verifyEmail = async (token: string): Promise<void> => {
     const data = await prisma.verificationToken.findFirst({
       where: { token: token },
     });
@@ -75,8 +79,70 @@ export class AuthService {
         id: data.userId,
       },
       data: {
-        is_id_verified: true,
+        isIdVerified: true,
       },
     });
+  };
+  static loginUser = async (
+    userLoginData: TUserLoginSchema,
+  ): Promise<{ accessToken: string; userData: User }> => {
+    const userWithEmail = await prisma.user.findUnique({
+      where: {
+        email: userLoginData.email,
+      },
+    });
+    if (!userWithEmail) {
+      throw new AppError("AUTH_USER_NOT_FOUND");
+    }
+    const isPasswordValid = await bcrypt.compare(
+      userLoginData.password,
+      userWithEmail.password,
+    );
+    if (!isPasswordValid) {
+      throw new AppError("AUTH_INVALID_CREDENTIALS");
+    }
+
+    if (!userWithEmail.isIdVerified) {
+      throw new AppError("AUTH_ACCOUNT_NOT_VERIFIED");
+    }
+    const accessToken = generateToken(
+      { id: userWithEmail.id },
+      TokenType.ACCESS,
+    );
+    if (userWithEmail.refreshToken === "") {
+      const refreshToken = generateToken(
+        { id: userWithEmail.id },
+        TokenType.REFRESH,
+      );
+      await prisma.user.update({
+        where: {
+          id: userWithEmail.id,
+        },
+        data: {
+          refreshToken: refreshToken.token,
+        },
+      });
+    }
+    return {
+      accessToken: accessToken.token,
+      userData: userWithEmail,
+    };
+  };
+  static refreshToken = async (
+    refreshToken: string,
+  ): Promise<{ accessToken: string }> => {
+    const decodedData = decodeToken(refreshToken, TokenType.REFRESH);
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decodedData.id,
+      },
+    });
+    if (!user || user.refreshToken !== refreshToken) {
+      throw new AppError("AUTH_INVALID_TOKEN");
+    }
+    const newAccessToken = generateToken({ id: user.id }, TokenType.ACCESS);
+    return {
+      accessToken: newAccessToken.token,
+    };
   };
 }

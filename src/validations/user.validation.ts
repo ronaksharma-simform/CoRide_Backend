@@ -76,6 +76,30 @@ export const UserRegistrationSchema = User.pick({
   gender: true,
   role: true,
 });
+export const UserLoginSchema = User.pick({
+  email: true,
+  password: true,
+});
+export const UserResponseSchema = User.pick({
+  username: true,
+  firstName: true,
+  middleName: true,
+  lastName: true,
+  email: true,
+  phone: true,
+  role: true,
+  gender: true,
+  avgRating: true,
+  totalRides: true,
+  createdAt: true,
+});
 type TUser = z.infer<typeof User>;
 type TUserRegistrationSchema = z.infer<typeof UserRegistrationSchema>;
-export { TUser, TUserRegistrationSchema };
+type TUserLoginSchema = z.infer<typeof UserLoginSchema>;
+type TUserResponseSchema = z.infer<typeof UserResponseSchema>;
+export {
+  TUser,
+  TUserRegistrationSchema,
+  TUserLoginSchema,
+  TUserResponseSchema,
+};
