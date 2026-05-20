@@ -8,6 +8,7 @@ import { TUser, TUserLoginSchema } from "@/validations/user.validation";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import { config } from "@/utils/config";
+import { logger } from "@/utils/logger";
 
 export class AuthService {
   static registerUser = async (
@@ -41,8 +42,8 @@ export class AuthService {
         phone: userRegistrationData.phone,
         password: hashedPassword,
         orgName: userRegistrationData.orgName,
-        role: userRegistrationData.role,
         gender: userRegistrationData.gender,
+        role: "USER",
         isIdVerified: false,
         refreshToken: refreshToken.token,
       },
@@ -75,21 +76,15 @@ export class AuthService {
       throw new AppError("INVALID_VERIFICATION_TOKEN");
     }
     await prisma.user.update({
-      where: {
-        id: data.userId,
-      },
-      data: {
-        isIdVerified: true,
-      },
+      where: { id: data.userId },
+      data: { isIdVerified: true },
     });
   };
   static loginUser = async (
     userLoginData: TUserLoginSchema,
   ): Promise<{ accessToken: string; userData: User }> => {
     const userWithEmail = await prisma.user.findUnique({
-      where: {
-        email: userLoginData.email,
-      },
+      where: { email: userLoginData.email },
     });
     if (!userWithEmail) {
       throw new AppError("AUTH_USER_NOT_FOUND");
@@ -99,6 +94,7 @@ export class AuthService {
       userWithEmail.password,
     );
     if (!isPasswordValid) {
+      logger.debug("Invalid password for user: " + userWithEmail.email);
       throw new AppError("AUTH_INVALID_CREDENTIALS");
     }
 
@@ -115,53 +111,43 @@ export class AuthService {
         TokenType.REFRESH,
       );
       await prisma.user.update({
-        where: {
-          id: userWithEmail.id,
-        },
-        data: {
-          refreshToken: refreshToken.token,
-        },
+        where: { id: userWithEmail.id },
+        data: { refreshToken: refreshToken.token },
       });
     }
-    return {
-      accessToken: accessToken.token,
-      userData: userWithEmail,
-    };
+    return { accessToken: accessToken.token, userData: userWithEmail };
   };
   static refreshToken = async (
     refreshToken: string,
   ): Promise<{ accessToken: string }> => {
     const decodedData = decodeToken(refreshToken, TokenType.REFRESH);
     const user = await prisma.user.findUnique({
-      where: {
-        id: decodedData.id,
-      },
+      where: { id: decodedData.id },
     });
     if (!user || user.refreshToken !== refreshToken) {
       throw new AppError("AUTH_INVALID_TOKEN");
     }
     const newAccessToken = generateToken({ id: user.id }, TokenType.ACCESS);
-    return {
-      accessToken: newAccessToken.token,
-    };
+    return { accessToken: newAccessToken.token };
   };
   static logout = async (refreshToken: string): Promise<void> => {
     const decodedData = decodeToken(refreshToken, TokenType.REFRESH);
     const user = await prisma.user.findUnique({
-      where: {
-        id: decodedData.id,
-      },
+      where: { id: decodedData.id },
     });
     if (!user || user.refreshToken !== refreshToken) {
       throw new AppError("AUTH_INVALID_TOKEN");
     }
     await prisma.user.update({
-      where: {
-        id: decodedData.id,
-      },
-      data: {
-        refreshToken: "",
-      },
+      where: { id: decodedData.id },
+      data: { refreshToken: "" },
     });
+  };
+  static findUserByEmail = async (email: string): Promise<User> => {
+    const user = await prisma.user.findUnique({ where: { email: email } });
+    if (!user) {
+      throw new AppError("AUTH_USER_NOT_FOUND");
+    }
+    return user;
   };
 }

@@ -96,3 +96,19 @@ export const logout: RequestHandler = async (req, res) => {
   res.clearCookie("refreshToken");
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
+export const resendVerificationEmail: RequestHandler = async (req, res) => {
+  const { email } = req.body;
+  const user = await AuthService.findUserByEmail(email);
+  const verificationToken = await AuthService.generateVerficationToken(user.id);
+  const verificationURL = config.jwt.verification.baseUrl + verificationToken;
+  logger.debug(verificationURL);
+  await MailService.sendMail(
+    user.email,
+    "Email Verification",
+    verificationTemplate(user.username, verificationURL),
+  );
+  res.status(200).json({
+    success: true,
+    message: "Email Send Sucessfully",
+  });
+};

@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 export const User = z.object({
   username: z
     .string()
@@ -74,12 +73,8 @@ export const UserRegistrationSchema = User.pick({
   phone: true,
   orgName: true,
   gender: true,
-  role: true,
 });
-export const UserLoginSchema = User.pick({
-  email: true,
-  password: true,
-});
+export const UserLoginSchema = User.pick({ email: true, password: true });
 export const UserResponseSchema = User.pick({
   username: true,
   firstName: true,
@@ -93,6 +88,7 @@ export const UserResponseSchema = User.pick({
   totalRides: true,
   createdAt: true,
 });
+export const ResendVerifyEmailSchema = User.pick({ email: true });
 type TUser = z.infer<typeof User>;
 type TUserRegistrationSchema = z.infer<typeof UserRegistrationSchema>;
 type TUserLoginSchema = z.infer<typeof UserLoginSchema>;
