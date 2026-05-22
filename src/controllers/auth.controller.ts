@@ -1,3 +1,4 @@
+import { HTTP_STATUS_CODES } from "@/constants/httpCodes";
 import { User } from "@/generated/prisma/client";
 import { AuthService } from "@/services/auth.services";
 import MailService from "@/services/mail.services";
@@ -39,7 +40,7 @@ export const registration: RequestHandler = async (req, res) => {
     "Email Verification",
     verificationTemplate(responseData.userData.username, verificationURL),
   );
-  res.status(201).json({
+  res.status(HTTP_STATUS_CODES.CREATED).json({
     success: true,
     message: "User registered successfully",
     data: toUserResponse(responseData.userData),
@@ -49,14 +50,14 @@ export const registration: RequestHandler = async (req, res) => {
 export const verifyEmail: RequestHandler = async (req, res) => {
   const { token } = req.query;
   if (!token && typeof token !== "string") {
-    return res.status(400).json({
+    return res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
       success: false,
       message: "Verification token is required",
     });
   }
   await AuthService.verifyEmail(token as string);
   return res
-    .status(200)
+    .status(HTTP_STATUS_CODES.OK)
     .json({ success: true, message: "Email verified successfully" });
 };
 
@@ -67,7 +68,7 @@ export const login: RequestHandler = async (req, res) => {
     secure: config.app.env === "production",
     expires: new Date(Date.now() + ms(config.jwt.refresh.expiry)),
   });
-  res.status(200).json({
+  res.status(HTTP_STATUS_CODES.OK).json({
     success: true,
     message: "Login successful",
     data: toUserResponse(responseData.userData),
@@ -80,7 +81,7 @@ export const refreshToken: RequestHandler = async (req, res) => {
     throw new AppError("AUTH_TOKEN_MISSING");
   }
   const newAccessToken = await AuthService.refreshToken(refreshToken);
-  res.status(200).json({
+  res.status(HTTP_STATUS_CODES.OK).json({
     success: true,
     message: "Access token refreshed successfully",
     accessToken: newAccessToken,
@@ -94,20 +95,21 @@ export const logout: RequestHandler = async (req, res) => {
   }
   await AuthService.logout(refreshToken);
   res.clearCookie("refreshToken");
-  res.status(200).json({ success: true, message: "Logged out successfully" });
+  res
+    .status(HTTP_STATUS_CODES.OK)
+    .json({ success: true, message: "Logged out successfully" });
 };
 export const resendVerificationEmail: RequestHandler = async (req, res) => {
   const { email } = req.body;
   const user = await AuthService.findUserByEmail(email);
   const verificationToken = await AuthService.generateVerficationToken(user.id);
   const verificationURL = config.jwt.verification.baseUrl + verificationToken;
-  logger.debug(verificationURL);
   await MailService.sendMail(
     user.email,
     "Email Verification",
     verificationTemplate(user.username, verificationURL),
   );
-  res.status(200).json({
+  res.status(HTTP_STATUS_CODES.OK).json({
     success: true,
     message: "Email Send Sucessfully",
   });

@@ -67,7 +67,7 @@ export class AuthService {
   };
   static verifyEmail = async (token: string): Promise<void> => {
     const data = await prisma.verificationToken.findFirst({
-      where: { token: token },
+      where: { token },
     });
     if (!data) {
       throw new AppError("INVALID_VERIFICATION_TOKEN");
@@ -144,7 +144,7 @@ export class AuthService {
     });
   };
   static findUserByEmail = async (email: string): Promise<User> => {
-    const user = await prisma.user.findUnique({ where: { email: email } });
+    const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       throw new AppError("AUTH_USER_NOT_FOUND");
     }
