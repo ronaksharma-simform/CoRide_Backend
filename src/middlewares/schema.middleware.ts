@@ -7,6 +7,7 @@ const validateSchema =
   (schema: ZodObject): RequestHandler =>
   async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
+      logger.debug(req.body);
       const bodyData = await schema.parseAsync(req.body);
       logger.debug(bodyData);
       next();
