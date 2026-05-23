@@ -1,6 +1,7 @@
 import express from "express";
 import errorMiddleware from "./middlewares/error.middleware";
 import authRoutes from "./routes/auth.routes";
+import vehicleRoutes from "./routes/vehicle.routes";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -25,7 +26,7 @@ app.get("/health", (_, res) => {
 
 // protected routes
 app.use("/api", authMiddleware);
-
+app.use("/api/vehicle", vehicleRoutes);
 // error handler (always last)
 app.use(errorMiddleware);
 export default app;

@@ -141,4 +141,29 @@ export const ERROR_MAP: Record<
     message: "Database operation failed",
     statusCode: HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
   },
+  // 🚗 VEHICLE
+  VEHICLE_PLATE_ALREADY_REGISTERED: {
+    message: "A vehicle with this license plate number is already registered",
+    statusCode: HTTP_STATUS_CODES.CONFLICT,
+  },
+
+  VEHICLE_NOT_FOUND: {
+    message: "The requested vehicle could not be found",
+    statusCode: HTTP_STATUS_CODES.NOT_FOUND,
+  },
+
+  VEHICLE_INVALID_PLATE_FORMAT: {
+    message: "License plate number format is invalid",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  VEHICLE_YEAR_OUT_OF_RANGE: {
+    message: "Vehicle year does not meet platform requirements",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  VEHICLE_INVALID_CAPACITY: {
+    message: "Seat capacity must be within allowed limits (e.g., 1 to 8 seats)",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
 };

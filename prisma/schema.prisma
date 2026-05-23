@@ -7,35 +7,52 @@ generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
 }
+
 datasource db {
   provider = "postgresql"
 }
 model User {
-  id              String   @id @default(uuid())
-  username        String   @unique
-  firstName       String
-  middleName      String   @default("")
-  lastName        String
-  email           String   @unique
-  password        String
-  phone           String   @unique
-  orgName         String
-  role            String
-  gender          String
-  isOrgVerified   Boolean  @default(false)
-  refreshToken    String   @default("")
-  isIdVerified    Boolean  @default(false)
-  avgRating       Float    @default(0)
-  totalRides      Int      @default(0)
-  createdAt       DateTime @default(now())
+  id            String     @id @default(uuid())
+  username      String     @unique
+  firstName     String
+  middleName    String     @default("")
+  lastName      String
+  email         String     @unique
+  password      String
+  phone         String     @unique
+  orgName       String
+  role          String
+  gender        String
+  isOrgVerified Boolean    @default(false)
+  refreshToken  String     @default("")
+  isIdVerified  Boolean    @default(false)
+  avgRating     Float      @default(0)
+  totalRides    Int        @default(0)
+  createdAt     DateTime   @default(now())
+  vehicles      Vehicle[]
+
   @@index([email])
 }
+
 model VerificationToken {
   id        String   @id @default(uuid())
-  userId    String    
-  token     String   @default("") 
+  userId    String
+  token     String   @default("")
   type      String   @default("Email Verification")
   expiresAt DateTime @default(now())
 
   @@index([token])
+}
+
+model Vehicle {
+  id           String   @id @default(uuid())
+  userId       String
+  company      String
+  model        String
+  color        String
+  plateNumber  String   @unique
+  seatCapacity Int
+  user         User     @relation(fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
+  @@index([userId])
 }
