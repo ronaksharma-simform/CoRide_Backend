@@ -56,3 +56,9 @@ model Vehicle {
   createdAt    DateTime @default(now())
   @@index([userId])
 }
+
+model Ride {
+  id String @id @default(uuid())
+  route Unsupported("geography(LINESTRING,4326)")
+
+}
