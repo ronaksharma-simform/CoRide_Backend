@@ -17,3 +17,11 @@ export const deleteRide: RequestHandler = async (req, res) => {
     message: "Ride Deleted sucessfully",
   });
 };
+export const updateRide: RequestHandler = async (req, res) => {
+  const responseData = await RideService.updateRide(req.body.data, req.body.id);
+  res.status(HTTP_STATUS_CODES.OK).json({
+    success: true,
+    message: "Ride Updated sucessfully",
+    data: responseData,
+  });
+};

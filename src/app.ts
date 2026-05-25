@@ -7,7 +7,6 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import authMiddleware from "./middlewares/auth.middleware";
-import { RideService } from "./services/ride.services";
 const app = express();
 app.use(
   cors({
@@ -23,7 +22,8 @@ app.use(express.urlencoded({ extended: true }));
 // public routes
 app.use("/auth", authRoutes);
 app.get("/health", authMiddleware, async (req, res) => {
-  await RideService.updateRide(req.body.data, req.body.id);
+  // await RideService.updateRide(req.body.data, req.body.id);
+  // const data= await prisma.ride.findMany();
   res.json("Working");
 });
 

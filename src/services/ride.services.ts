@@ -15,7 +15,8 @@ export class RideService {
     if (!vehicleWithExistingId) {
       throw new AppError("VEHICLE_NOT_FOUND");
     }
-
+    logger.debug("Creating ride with data: ");
+    logger.debug(rideRegistrationData);
     const responseData = await prisma.$queryRaw<Vehicle[]>`
  INSERT INTO "Ride" (
     "providerId",
@@ -58,13 +59,7 @@ RETURNING *
   static readonly createLineString = (
     data: { lat: number; lng: number }[],
   ): string => {
-    let resultantString = "";
-    for (const cooridinate of data) {
-      resultantString += `${cooridinate.lng} ${cooridinate.lat},\n`;
-    }
-    resultantString = resultantString.substring(0, resultantString.length - 1);
-    logger.debug(resultantString);
-    return resultantString;
+    return data.map((point) => `${point.lng} ${point.lat}`).join(", ");
   };
   static readonly deleteRide = async (id: string): Promise<Ride> => {
     try {
@@ -84,30 +79,30 @@ RETURNING *
   static readonly updateRide = async (
     rideUpdateData: TRideUpdateSchema,
     id: string,
-  ): Promise<void> => {
+  ): Promise<Ride> => {
     const updates: string[] = [];
     if (rideUpdateData?.status !== undefined) {
-      updates.push(`"status" = ${rideUpdateData.status}`);
+      updates.push(`"status" = '${rideUpdateData.status}'`);
     }
     if (rideUpdateData?.sourceLabel !== undefined) {
       updates.push(`"sourceLabel" = ST_GeographyFromText('
         ${`POINT(${rideUpdateData.sourceLabel.lng} ${rideUpdateData.sourceLabel.lat})`}')`);
     }
     if (rideUpdateData?.destinationLabel !== undefined) {
-      updates.push(`"sourceLabel" = ST_GeographyFromText('
+      updates.push(`"destinationLabel" = ST_GeographyFromText('
         ${`POINT(${rideUpdateData.destinationLabel.lng} ${rideUpdateData.destinationLabel.lat})`}')`);
     }
     if (rideUpdateData?.totalSeats !== undefined) {
-      updates.push(`totalSeats = ${rideUpdateData.totalSeats}`);
+      updates.push(`"totalSeats" = ${rideUpdateData.totalSeats}`);
     }
     if (rideUpdateData?.availableSeats !== undefined) {
-      updates.push(`availableSeats = ${rideUpdateData.availableSeats}`);
+      updates.push(`"availableSeats" = ${rideUpdateData.availableSeats}`);
     }
     if (rideUpdateData?.departureTime !== undefined) {
-      updates.push(`departureTime = ${rideUpdateData.departureTime}`);
+      updates.push(`"departureTime" = '${rideUpdateData.departureTime}'`);
     }
     if (rideUpdateData?.route !== undefined) {
-      updates.push(`route = ST_GeographyFromText('
+      updates.push(`"route" = ST_GeographyFromText('
         ${`LINESTRING(
            ${this.createLineString(rideUpdateData.route)}
         )`}
@@ -117,8 +112,9 @@ RETURNING *
         UPDATE "Ride" 
         SET ${updates.join(", ")}
         WHERE id = '${id}'
+        returning *
         `;
-    logger.debug(query);
-    await prisma.$queryRawUnsafe(query);
+    const updatedRide = await prisma.$queryRawUnsafe<Ride[]>(query);
+    return updatedRide[0];
   };
 }

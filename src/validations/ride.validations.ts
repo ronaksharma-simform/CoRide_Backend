@@ -8,7 +8,7 @@ export const Ride = z.object({
   sourceLabel: cooridinateSchema,
   destinationLabel: cooridinateSchema,
   route: z.array(cooridinateSchema),
-  departureTime: z
+  departureTime: z.coerce
     .date()
     .refine((date) => date > new Date(), "Departure must be in future"),
   totalSeats: z
