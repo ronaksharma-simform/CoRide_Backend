@@ -2,10 +2,12 @@ import express from "express";
 import errorMiddleware from "./middlewares/error.middleware";
 import authRoutes from "./routes/auth.routes";
 import vehicleRoutes from "./routes/vehicle.routes";
+import rideRoutes from "./routes/ride.routes";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import authMiddleware from "./middlewares/auth.middleware";
+import { RideService } from "./services/ride.services";
 const app = express();
 app.use(
   cors({
@@ -20,13 +22,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // public routes
 app.use("/auth", authRoutes);
-app.get("/health", (_, res) => {
+app.get("/health", authMiddleware, async (req, res) => {
+  await RideService.updateRide(req.body.data, req.body.id);
   res.json("Working");
 });
 
 // protected routes
 app.use("/api", authMiddleware);
 app.use("/api/vehicle", vehicleRoutes);
+app.use("/api/ride", rideRoutes);
 // error handler (always last)
 app.use(errorMiddleware);
 export default app;

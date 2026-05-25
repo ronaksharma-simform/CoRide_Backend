@@ -1,10 +1,7 @@
 import { ERROR_CODES } from "../constants/errorCodes";
 import { HTTP_STATUS_CODES } from "./httpCodes";
 
-type ErrorDefinition = {
-  message: string;
-  statusCode: number;
-};
+type ErrorDefinition = { message: string; statusCode: number };
 
 export const ERROR_MAP: Record<
   (typeof ERROR_CODES)[keyof typeof ERROR_CODES],
@@ -165,5 +162,85 @@ export const ERROR_MAP: Record<
   VEHICLE_INVALID_CAPACITY: {
     message: "Seat capacity must be within allowed limits (e.g., 1 to 8 seats)",
     statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+  // 🚘 RIDE
+  RIDE_NOT_FOUND: {
+    message: "Ride not found",
+    statusCode: HTTP_STATUS_CODES.NOT_FOUND,
+  },
+
+  RIDE_ALREADY_STARTED: {
+    message: "Ride has already started",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_ALREADY_COMPLETED: {
+    message: "Ride is already completed",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_ALREADY_CANCELLED: {
+    message: "Ride has already been cancelled",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_SEATS_NOT_AVAILABLE: {
+    message: "Requested seats are not available",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_INVALID_ROUTE: {
+    message: "Invalid pickup or destination route",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_INVALID_TIME: {
+    message: "Invalid departure time provided",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_PAST_DEPARTURE_TIME: {
+    message: "Departure time cannot be in the past",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_DRIVER_VEHICLE_REQUIRED: {
+    message: "Driver must register a vehicle before creating a ride",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_PICKUP_REQUIRED: {
+    message: "Pickup location is required",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_DESTINATION_REQUIRED: {
+    message: "Destination location is required",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_CANNOT_JOIN_OWN_RIDE: {
+    message: "You cannot join your own ride",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_ALREADY_JOINED: {
+    message: "You have already joined this ride",
+    statusCode: HTTP_STATUS_CODES.CONFLICT,
+  },
+
+  RIDE_MAX_CAPACITY_REACHED: {
+    message: "Ride has reached maximum seat capacity",
+    statusCode: HTTP_STATUS_CODES.CONFLICT,
+  },
+
+  RIDE_INVALID_FARE: {
+    message: "Ride fare amount is invalid",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_UNAUTHORIZED_ACTION: {
+    message: "You are not allowed to perform this ride action",
+    statusCode: HTTP_STATUS_CODES.FORBIDDEN,
   },
 };

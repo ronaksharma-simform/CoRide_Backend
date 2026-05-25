@@ -11,25 +11,27 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
 model User {
-  id            String     @id @default(uuid())
-  username      String     @unique
+  id            String    @id @default(uuid())
+  username      String    @unique
   firstName     String
-  middleName    String     @default("")
+  middleName    String    @default("")
   lastName      String
-  email         String     @unique
+  email         String    @unique
   password      String
-  phone         String     @unique
+  phone         String    @unique
   orgName       String
   role          String
   gender        String
-  isOrgVerified Boolean    @default(false)
-  refreshToken  String     @default("")
-  isIdVerified  Boolean    @default(false)
-  avgRating     Float      @default(0)
-  totalRides    Int        @default(0)
-  createdAt     DateTime   @default(now())
+  isOrgVerified Boolean   @default(false)
+  refreshToken  String    @default("")
+  isIdVerified  Boolean   @default(false)
+  avgRating     Float     @default(0)
+  totalRides    Int       @default(0)
+  createdAt     DateTime  @default(now())
   vehicles      Vehicle[]
+  rides         Ride[]
 
   @@index([email])
 }
@@ -54,5 +56,31 @@ model Vehicle {
   seatCapacity Int
   user         User     @relation(fields: [userId], references: [id])
   createdAt    DateTime @default(now())
+  rides        Ride[]
+
   @@index([userId])
+}
+
+enum RideStatus {
+  ACTIVE
+  FULL
+  COMPLETED
+  CANCELLED
+}
+
+model Ride {
+  id               String                                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  providerId       String
+  vehicleId        String
+  sourceLabel      Unsupported("GEOGRAPHY(POINT,4326)")
+  destinationLabel Unsupported("GEOGRAPHY(POINT,4326)")
+  route            Unsupported("GEOGRAPHY(LINESTRING , 4326)")
+  departureTime    DateTime
+  totalSeats       Int
+  availableSeats   Int
+  status           RideStatus                                 @default(ACTIVE)
+  createdAt        DateTime                                   @default(now())
+  updatedAt        DateTime                                   @default(now())
+  user             User                                       @relation(fields: [providerId], references: [id])
+  vehicle          Vehicle                                    @relation(fields: [vehicleId], references: [id])
 }
