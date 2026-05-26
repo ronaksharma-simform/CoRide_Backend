@@ -4,7 +4,7 @@ export const User = z.object({
     .string()
     .min(3, "Username must be at least 4 characters")
     .max(20)
-    .regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, underscore allowed"),
+    .regex(/^\w+$/, "Only letters, numbers, underscore allowed"),
 
   firstName: z.string().min(1, "First name is required"),
 
@@ -12,10 +12,7 @@ export const User = z.object({
 
   lastName: z.string().min(1, "Last name is required"),
 
-  email: z
-    .string()
-    .email("Invalid email")
-    .transform((val) => val.toLowerCase()),
+  email: z.email("Invalid email").transform((val) => val.toLowerCase()),
 
   password: z
     .string()

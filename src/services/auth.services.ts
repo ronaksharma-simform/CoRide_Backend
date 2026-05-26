@@ -11,7 +11,7 @@ import { config } from "@/utils/config";
 import { logger } from "@/utils/logger";
 
 export class AuthService {
-  static registerUser = async (
+  static readonly registerUser = async (
     userRegistrationData: TUser,
   ): Promise<{ userData: User }> => {
     const userWithExistingEmailOrPhone = await prisma.user.findFirst({
@@ -51,7 +51,9 @@ export class AuthService {
     return { userData: user };
   };
 
-  static generateVerficationToken = async (userId: string): Promise<string> => {
+  static readonly generateVerficationToken = async (
+    userId: string,
+  ): Promise<string> => {
     const verificationToken = generateHashToken();
     await prisma.verificationToken.create({
       data: {
@@ -65,7 +67,7 @@ export class AuthService {
     });
     return verificationToken.hashedToken;
   };
-  static verifyEmail = async (token: string): Promise<void> => {
+  static readonly verifyEmail = async (token: string): Promise<void> => {
     const data = await prisma.verificationToken.findFirst({
       where: { token },
     });
@@ -80,7 +82,7 @@ export class AuthService {
       data: { isIdVerified: true },
     });
   };
-  static loginUser = async (
+  static readonly loginUser = async (
     userLoginData: TUserLoginSchema,
   ): Promise<{ accessToken: string; userData: User }> => {
     const userWithEmail = await prisma.user.findUnique({
@@ -117,25 +119,25 @@ export class AuthService {
     }
     return { accessToken: accessToken.token, userData: userWithEmail };
   };
-  static refreshToken = async (
+  static readonly refreshToken = async (
     refreshToken: string,
   ): Promise<{ accessToken: string }> => {
     const decodedData = decodeToken(refreshToken, TokenType.REFRESH);
     const user = await prisma.user.findUnique({
       where: { id: decodedData.id },
     });
-    if (!user || user.refreshToken !== refreshToken) {
+    if (user?.refreshToken !== refreshToken) {
       throw new AppError("AUTH_INVALID_TOKEN");
     }
     const newAccessToken = generateToken({ id: user.id }, TokenType.ACCESS);
     return { accessToken: newAccessToken.token };
   };
-  static logout = async (refreshToken: string): Promise<void> => {
+  static readonly logout = async (refreshToken: string): Promise<void> => {
     const decodedData = decodeToken(refreshToken, TokenType.REFRESH);
     const user = await prisma.user.findUnique({
       where: { id: decodedData.id },
     });
-    if (!user || user.refreshToken !== refreshToken) {
+    if (user?.refreshToken !== refreshToken) {
       throw new AppError("AUTH_INVALID_TOKEN");
     }
     await prisma.user.update({
@@ -143,7 +145,7 @@ export class AuthService {
       data: { refreshToken: "" },
     });
   };
-  static findUserByEmail = async (email: string): Promise<User> => {
+  static readonly findUserByEmail = async (email: string): Promise<User> => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       throw new AppError("AUTH_USER_NOT_FOUND");

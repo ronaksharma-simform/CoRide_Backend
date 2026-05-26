@@ -1,5 +1,6 @@
 import { ErrorCode } from "@/constants/errorCodes";
 import { ERROR_MAP } from "@/constants/errorDefinitions";
+import { logger } from "./logger";
 class AppError extends Error {
   public statusCode: number;
   public code: ErrorCode;
@@ -12,7 +13,7 @@ class AppError extends Error {
     this.statusCode = errorDef.statusCode;
     this.code = code;
     this.details = details;
-
+    logger.debug(details);
     Error.captureStackTrace(this);
   }
 }

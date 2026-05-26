@@ -14,7 +14,6 @@ import {
   UserLoginSchema,
   UserRegistrationSchema,
 } from "@/validations/user.validation";
-// import z,{  string } from "zod";
 const route = Router();
 
 route.post(
