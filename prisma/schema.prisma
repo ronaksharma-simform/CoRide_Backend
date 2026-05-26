@@ -13,25 +13,26 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  username      String    @unique
+  id            String        @id @default(uuid())
+  username      String        @unique
   firstName     String
-  middleName    String    @default("")
+  middleName    String        @default("")
   lastName      String
-  email         String    @unique
+  email         String        @unique
   password      String
-  phone         String    @unique
+  phone         String        @unique
   orgName       String
   role          String
   gender        String
-  isOrgVerified Boolean   @default(false)
-  refreshToken  String    @default("")
-  isIdVerified  Boolean   @default(false)
-  avgRating     Float     @default(0)
-  totalRides    Int       @default(0)
-  createdAt     DateTime  @default(now())
+  isOrgVerified Boolean       @default(false)
+  refreshToken  String        @default("")
+  isIdVerified  Boolean       @default(false)
+  avgRating     Float         @default(0)
+  totalRides    Int           @default(0)
+  createdAt     DateTime      @default(now())
   vehicles      Vehicle[]
   rides         Ride[]
+  rideRequests  RideRequest[]
 
   @@index([email])
 }
@@ -68,8 +69,21 @@ enum RideStatus {
   CANCELLED
 }
 
+enum RideRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+enum RequestPriority {
+  TIMEFIRST
+  DISTANCEFIRST
+  BALANCED
+}
+
 model Ride {
-  id               String                                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id               String                                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   providerId       String
   vehicleId        String
   sourceLabel      Unsupported("GEOGRAPHY(POINT,4326)")
@@ -78,9 +92,29 @@ model Ride {
   departureTime    DateTime
   totalSeats       Int
   availableSeats   Int
-  status           RideStatus                                 @default(ACTIVE)
-  createdAt        DateTime                                   @default(now())
-  updatedAt        DateTime                                   @default(now())
-  user             User                                       @relation(fields: [providerId], references: [id])
-  vehicle          Vehicle                                    @relation(fields: [vehicleId], references: [id])
+  status           RideStatus                                  @default(ACTIVE)
+  createdAt        DateTime                                    @default(now())
+  updatedAt        DateTime                                    @default(now())
+  user             User                                        @relation(fields: [providerId], references: [id])
+  vehicle          Vehicle                                     @relation(fields: [vehicleId], references: [id])
+  rideRequests     RideRequest[]
+
+  @@index([providerId])
+}
+
+model RideRequest {
+  id              String                               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  rideId          String                               @db.Uuid   
+  seekerId        String
+  priority        RequestPriority                      @default(BALANCED)
+  meetingPoint    Unsupported("GEOGRAPHY(POINT,4326)")
+  distanceToRoute Float
+  respondedAt     DateTime?
+  status          RideRequestStatus                    @default(PENDING)
+  createdAt       DateTime                             @default(now())
+  expiresAt       DateTime?
+  ride            Ride                                 @relation(fields: [rideId], references: [id])
+  user            User                                 @relation(fields: [seekerId], references: [id])
+  @@index([seekerId])
+  @@index([rideId])
 }
