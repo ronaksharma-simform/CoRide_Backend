@@ -243,4 +243,8 @@ export const ERROR_MAP: Record<
     message: "You are not allowed to perform this ride action",
     statusCode: HTTP_STATUS_CODES.FORBIDDEN,
   },
+  RIDE_NO_DATA_TO_UPDATE: {
+    message: "No data given to update ride",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
 };

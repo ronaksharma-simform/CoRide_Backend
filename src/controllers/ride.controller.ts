@@ -25,3 +25,19 @@ export const updateRide: RequestHandler = async (req, res) => {
     data: responseData,
   });
 };
+export const getRideData: RequestHandler = async (req, res) => {
+  const responseData = await RideService.getRideData(req.body.id);
+  res.status(HTTP_STATUS_CODES.OK).json({
+    success: true,
+    message: "Ride Data ",
+    data: responseData,
+  });
+};
+export const getUserData: RequestHandler = async (req, res) => {
+  const responseData = await RideService.getUserRide(req.user.id);
+  res.status(HTTP_STATUS_CODES.OK).json({
+    success: true,
+    message: "All Rides of User ",
+    data: responseData,
+  });
+};

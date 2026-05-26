@@ -21,9 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // public routes
 app.use("/auth", authRoutes);
-app.get("/health", authMiddleware, async (req, res) => {
-  // await RideService.updateRide(req.body.data, req.body.id);
-  // const data= await prisma.ride.findMany();
+app.get("/health", authMiddleware, (_, res) => {
   res.json("Working");
 });
 

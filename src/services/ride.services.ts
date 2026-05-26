@@ -1,8 +1,12 @@
 import { prisma } from "@/config/prisma";
-import { Prisma, Ride, Vehicle } from "@/generated/prisma/client";
+import { Ride, Vehicle } from "@/generated/prisma/client";
 import AppError from "@/utils/customErrorClass";
 import { logger } from "@/utils/logger";
-import { TRide, TRideUpdateSchema } from "@/validations/ride.validations";
+import {
+  TRide,
+  TRideDataSchema,
+  TRideUpdateSchema,
+} from "@/validations/ride.validations";
 
 export class RideService {
   static readonly createRide = async (
@@ -62,24 +66,21 @@ RETURNING *
     return data.map((point) => `${point.lng} ${point.lat}`).join(", ");
   };
   static readonly deleteRide = async (id: string): Promise<Ride> => {
-    try {
-      const deletedRide = await prisma.ride.delete({ where: { id } });
-      return deletedRide;
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2025"
-      ) {
-        throw new AppError("RIDE_NOT_FOUND");
-      }
-
-      throw error;
-    }
+    const rideWithExistingId = await prisma.ride.findUnique({
+      where: { id },
+    });
+    if (!rideWithExistingId) throw new AppError("RIDE_NOT_FOUND");
+    const deletedRide = await prisma.ride.delete({ where: { id } });
+    return deletedRide;
   };
   static readonly updateRide = async (
     rideUpdateData: TRideUpdateSchema,
     id: string,
   ): Promise<Ride> => {
+    const rideWithExistingId = await prisma.ride.findUnique({
+      where: { id },
+    });
+    if (!rideWithExistingId) throw new AppError("RIDE_NOT_FOUND");
     const updates: string[] = [];
     if (rideUpdateData?.status !== undefined) {
       updates.push(`"status" = '${rideUpdateData.status}'`);
@@ -108,6 +109,9 @@ RETURNING *
         )`}
     ')`);
     }
+    if (updates.length === 0) {
+      throw new AppError("RIDE_NO_DATA_TO_UPDATE");
+    }
     const query = `
         UPDATE "Ride" 
         SET ${updates.join(", ")}
@@ -116,5 +120,83 @@ RETURNING *
         `;
     const updatedRide = await prisma.$queryRawUnsafe<Ride[]>(query);
     return updatedRide[0];
+  };
+  static readonly getRideData = async (
+    id: string,
+  ): Promise<TRideDataSchema> => {
+    const rideWithExistingId = await prisma.ride.findUnique({
+      where: { id },
+    });
+    if (!rideWithExistingId) throw new AppError("RIDE_NOT_FOUND");
+    const result = await prisma.$queryRaw<TRideDataSchema[]>`
+    SELECT 
+      id,
+      "providerId",
+      "vehicleId",
+      "departureTime",
+      "totalSeats",
+      "availableSeats",
+      status,
+      "createdAt",
+      "updatedAt",
+      
+      -- Convert POINT to { lat, lng } JSON object
+      json_build_object(
+        'lng', ST_X("sourceLabel"::geometry),
+        'lat', ST_Y("sourceLabel"::geometry)
+      ) AS "sourceLabel",
+
+      -- Convert POINT to { lat, lng } JSON object
+      json_build_object(
+        'lng', ST_X("destinationLabel"::geometry),
+        'lat', ST_Y("destinationLabel"::geometry)
+      ) AS "destinationLabel",
+
+      -- Convert LINESTRING into an array of { lat, lng } JSON objects
+      (
+        SELECT json_agg(json_build_object('lng', ST_X(geom), 'lat', ST_Y(geom)))
+        FROM ST_DumpPoints("route"::geometry)
+      ) AS "route"
+
+    FROM "Ride"
+    WHERE "id" = ${id}::uuid;
+  `;
+    return result[0];
+  };
+  static readonly getUserRide = async (
+    id: string,
+  ): Promise<TRideDataSchema[]> => {
+    const userWithExistingId = await prisma.user.findUnique({
+      where: { id },
+    });
+    if (!userWithExistingId) throw new AppError("AUTH_USER_NOT_FOUND");
+    const result = await prisma.$queryRaw<TRideDataSchema[]>`
+    SELECT 
+      id,
+      "providerId",
+      "vehicleId",
+      "departureTime",
+      "totalSeats",
+      "availableSeats",
+      status,
+      "createdAt",
+      "updatedAt",
+      json_build_object(
+        'lng', ST_X("sourceLabel"::geometry),
+        'lat', ST_Y("sourceLabel"::geometry)
+      ) AS "sourceLabel",
+      json_build_object(
+        'lng', ST_X("destinationLabel"::geometry),
+        'lat', ST_Y("destinationLabel"::geometry)
+      ) AS "destinationLabel",
+      (
+        SELECT json_agg(json_build_object('lng', ST_X(geom), 'lat', ST_Y(geom)))
+        FROM ST_DumpPoints("route"::geometry)
+      ) AS "route"
+
+    FROM "Ride"
+    where "providerId" = ${id}
+  `;
+    return result;
   };
 }
