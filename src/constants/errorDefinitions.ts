@@ -247,4 +247,80 @@ export const ERROR_MAP: Record<
     message: "No data given to update ride",
     statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
   },
+  // 🚖 RIDE REQUEST
+  RIDE_REQUEST_NOT_FOUND: {
+    message: "Ride request not found",
+    statusCode: HTTP_STATUS_CODES.NOT_FOUND,
+  },
+
+  RIDE_REQUEST_ALREADY_EXISTS: {
+    message: "Ride request already exists",
+    statusCode: HTTP_STATUS_CODES.CONFLICT,
+  },
+
+  RIDE_REQUEST_ALREADY_ACCEPTED: {
+    message: "Ride request has already been accepted",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_REQUEST_ALREADY_REJECTED: {
+    message: "Ride request has already been rejected",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_REQUEST_ALREADY_CANCELLED: {
+    message: "Ride request has already been cancelled",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_REQUEST_CANNOT_REQUEST_OWN_RIDE: {
+    message: "You cannot request your own ride",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_REQUEST_RIDE_FULL: {
+    message: "Ride is already full",
+    statusCode: HTTP_STATUS_CODES.CONFLICT,
+  },
+
+  RIDE_REQUEST_INVALID_STATUS: {
+    message: "Invalid ride request status",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_REQUEST_UNAUTHORIZED_ACTION: {
+    message:
+      "You are not authorized to perform this action on the ride request",
+    statusCode: HTTP_STATUS_CODES.FORBIDDEN,
+  },
+
+  RIDE_REQUEST_SEAT_LIMIT_EXCEEDED: {
+    message: "Requested seat count exceeds available seats",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_REQUEST_RIDE_STARTED: {
+    message: "Cannot request or modify request after ride has started",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_REQUEST_RIDE_COMPLETED: {
+    message: "Cannot request or modify request for a completed ride",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_REQUEST_RIDE_CANCELLED: {
+    message: "Cannot request or modify request for a cancelled ride",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  RIDE_REQUEST_PASSENGER_NOT_FOUND: {
+    message: "Passenger not found",
+    statusCode: HTTP_STATUS_CODES.NOT_FOUND,
+  },
+
+  RIDE_REQUEST_DRIVER_NOT_FOUND: {
+    message: "Driver not found",
+    statusCode: HTTP_STATUS_CODES.NOT_FOUND,
+  },
 };

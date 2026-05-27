@@ -6,7 +6,11 @@ export const RideRequest = z.object({
     .enum(["TIMEFIRST", "DISTANCEFIRST", "BALANCED"])
     .default("BALANCED"),
   meetingPoint: cooridinateSchema,
-  distanceToRoute: z.float32("Distance is required"),
+  distanceToRoute: z
+    .float32("Distance is required")
+    .refine((data) => data > 0, {
+      message: "Distance should be positive number",
+    }),
   status: z.enum(["PENDING", "ACCEPTED", "REJECTED", "CANCELLED"]),
 });
 type TRideRequest = z.infer<typeof RideRequest>;

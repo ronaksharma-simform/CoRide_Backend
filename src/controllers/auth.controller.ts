@@ -5,7 +5,6 @@ import MailService from "@/services/mail.services";
 import { verificationTemplate } from "@/templates/verification.template";
 import { config } from "@/utils/config";
 import AppError from "@/utils/customErrorClass";
-import { logger } from "@/utils/logger";
 import {
   TUserResponseSchema,
   UserResponseSchema,
@@ -34,7 +33,6 @@ export const registration: RequestHandler = async (req, res) => {
     responseData.userData.id,
   );
   const verificationURL = config.jwt.verification.baseUrl + verificationToken;
-  logger.debug(verificationURL);
   await MailService.sendMail(
     responseData.userData.email,
     "Email Verification",

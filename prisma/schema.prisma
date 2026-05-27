@@ -104,9 +104,10 @@ model Ride {
 
 model RideRequest {
   id              String                               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  rideId          String                               @db.Uuid   
+  rideId          String                               @db.Uuid
   seekerId        String
   priority        RequestPriority                      @default(BALANCED)
+  sourcePoint     Unsupported("GEOGRAPHY(POINT,4326)")
   meetingPoint    Unsupported("GEOGRAPHY(POINT,4326)")
   distanceToRoute Float
   respondedAt     DateTime?
@@ -115,6 +116,7 @@ model RideRequest {
   expiresAt       DateTime?
   ride            Ride                                 @relation(fields: [rideId], references: [id])
   user            User                                 @relation(fields: [seekerId], references: [id])
+
   @@index([seekerId])
   @@index([rideId])
 }
