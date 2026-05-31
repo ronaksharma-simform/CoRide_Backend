@@ -2,6 +2,7 @@ import express from "express";
 import errorMiddleware from "./middlewares/error.middleware";
 import authRoutes from "./routes/auth.routes";
 import vehicleRoutes from "./routes/vehicle.routes";
+import rideRequestRoutes from "./routes/rideRequest.routes";
 import rideRoutes from "./routes/ride.routes";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
@@ -31,6 +32,7 @@ app.get("/health", authMiddleware, async (req, res) => {
 app.use("/api", authMiddleware);
 app.use("/api/vehicle", vehicleRoutes);
 app.use("/api/ride", rideRoutes);
+app.use("/api/rideRequest", rideRequestRoutes);
 // error handler (always last)
 app.use(errorMiddleware);
 export default app;
