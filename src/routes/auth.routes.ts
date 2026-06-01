@@ -18,20 +18,20 @@ const route = Router();
 
 route.post(
   "/register",
-  validateSchema(UserRegistrationSchema),
+  validateSchema(UserRegistrationSchema, "body"),
   asyncHandler(registration),
 );
 route.get("/verify-email", asyncHandler(verifyEmail));
 route.post(
   "/login",
-  asyncHandler(validateSchema(UserLoginSchema)),
+  asyncHandler(validateSchema(UserLoginSchema, "body")),
   asyncHandler(login),
 );
 route.post("/refresh-token", asyncHandler(refreshToken));
 route.post("/logout", asyncHandler(logout));
 route.post(
   "/resend-verify-email",
-  asyncHandler(validateSchema(ResendVerifyEmailSchema)),
+  asyncHandler(validateSchema(ResendVerifyEmailSchema, "body")),
   asyncHandler(resendVerificationEmail),
 );
 export default route;

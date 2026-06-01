@@ -29,7 +29,7 @@ export class VehicleService {
     });
     return vehicle;
   };
-  static readonly deleteVehicle = async (id: string): Promise<void> => {
+  static readonly deleteVehicle = async (id: string): Promise<Vehicle> => {
     const vehicleWithExistingId = await prisma.vehicle.findUnique({
       where: { id },
     });
@@ -39,6 +39,7 @@ export class VehicleService {
     await prisma.vehicle.delete({
       where: { id },
     });
+    return vehicleWithExistingId;
   };
   static readonly getVehicleById = async (id: string): Promise<Vehicle> => {
     const vehicle = await prisma.vehicle.findUnique({

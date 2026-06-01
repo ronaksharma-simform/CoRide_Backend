@@ -5,6 +5,7 @@ import MailService from "@/services/mail.services";
 import { verificationTemplate } from "@/templates/verification.template";
 import { config } from "@/utils/config";
 import AppError from "@/utils/customErrorClass";
+import { logger } from "@/utils/logger";
 import {
   TUserResponseSchema,
   UserResponseSchema,
@@ -61,11 +62,23 @@ export const verifyEmail: RequestHandler = async (req, res) => {
 
 export const login: RequestHandler = async (req, res) => {
   const responseData = await AuthService.loginUser(req.body);
+  logger.info("Login successful, preparing to set cookies and send response");
+  logger.info(responseData.userData.refreshToken.length);
+  logger.info(responseData.accessToken.length);
   res.cookie("refreshToken", responseData.userData.refreshToken, {
     httpOnly: true,
+    sameSite: "lax",
     secure: config.app.env === "production",
     expires: new Date(Date.now() + ms(config.jwt.refresh.expiry)),
   });
+
+  res.cookie("accessToken", responseData.accessToken, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: config.app.env === "production",
+    expires: new Date(Date.now() + ms(config.jwt.access.expiry)),
+  });
+
   res.status(HTTP_STATUS_CODES.OK).json({
     success: true,
     message: "Login successful",
@@ -93,6 +106,7 @@ export const logout: RequestHandler = async (req, res) => {
   }
   await AuthService.logout(refreshToken);
   res.clearCookie("refreshToken");
+  res.clearCookie("accessToken");
   res
     .status(HTTP_STATUS_CODES.OK)
     .json({ success: true, message: "Logged out successfully" });

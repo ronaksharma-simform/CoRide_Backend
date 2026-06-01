@@ -13,10 +13,18 @@ const route = Router();
 
 route.post(
   "/",
-  validateSchema(VehicleRegisterSchema),
+  validateSchema(VehicleRegisterSchema, "body"),
   asyncHandler(registerVehicle),
 );
-route.delete("/", validateSchema(IdSchema), asyncHandler(deleteVehicle));
-route.get("/vehicle", validateSchema(IdSchema), asyncHandler(getVehicle));
+route.delete(
+  "/:id",
+  validateSchema(IdSchema, "params"),
+  asyncHandler(deleteVehicle),
+);
+route.get(
+  "/vehicle/:id",
+  validateSchema(IdSchema, "params"),
+  asyncHandler(getVehicle),
+);
 route.get("/vehicles", asyncHandler(getUserVehicles));
 export default route;

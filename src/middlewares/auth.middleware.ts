@@ -11,22 +11,18 @@ const authMiddleware = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  const token = req.cookies.accessToken;
+  logger.info("Access token from cookies:", token);
+  logger.info(req.cookies);
+  if (!token) {
     throw new AppError(ERROR_CODES.AUTH_TOKEN_MISSING);
   }
-
-  // Extracting Token
-  const token = authHeader.split(" ")[1];
-  //  verify token
   const decodedData = decodeToken(token.trim(), TokenType.ACCESS);
   const userDetails = await prisma.user.findUnique({
     where: {
       id: decodedData.id,
     },
   });
-  // Attaching User details
   req.user = userDetails;
   logger.info("User details attached to request object:", req.user);
   next();

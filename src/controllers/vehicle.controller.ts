@@ -14,14 +14,19 @@ export const registerVehicle: RequestHandler = async (req, res) => {
   });
 };
 export const deleteVehicle: RequestHandler = async (req, res) => {
-  await VehicleService.deleteVehicle(req.body.id);
+  const responseData = await VehicleService.deleteVehicle(
+    req.params.id as string,
+  );
   res.status(HTTP_STATUS_CODES.OK).json({
     success: true,
     message: "Vehicle Deleted Sucessfully",
+    data: responseData,
   });
 };
 export const getVehicle: RequestHandler = async (req, res) => {
-  const responseData = await VehicleService.getVehicleById(req.body.id);
+  const responseData = await VehicleService.getVehicleById(
+    req.query.id as string,
+  );
   res.status(HTTP_STATUS_CODES.OK).json({
     success: true,
     message: "Vehicle data",

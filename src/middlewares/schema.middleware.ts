@@ -4,11 +4,11 @@ import { NextFunction, RequestHandler, Request, Response } from "express";
 import { ZodError, ZodObject } from "zod";
 
 const validateSchema =
-  (schema: ZodObject): RequestHandler =>
+  (schema: ZodObject, type: "body" | "query" | "params"): RequestHandler =>
   async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
-      logger.debug(req.body);
-      const bodyData = await schema.parseAsync(req.body);
+      logger.debug(typeof req.params);
+      const bodyData = await schema.parseAsync(req[type]);
       logger.debug(bodyData);
       next();
     } catch (error) {

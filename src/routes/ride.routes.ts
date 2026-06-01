@@ -12,7 +12,7 @@ import { Ride, RideUpdateData } from "@/validations/ride.validations";
 import { Router } from "express";
 
 const router = Router();
-router.post("/", validateSchema(Ride), asyncHandler(registerRide));
+router.post("/", validateSchema(Ride, "body"), asyncHandler(registerRide));
 router.delete("/", validateSchema(IdSchema), asyncHandler(deleteRide));
 router.put("/", validateSchema(RideUpdateData), asyncHandler(updateRide));
 router.get("/", validateSchema(IdSchema), asyncHandler(getRideData));

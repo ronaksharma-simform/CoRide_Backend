@@ -4,5 +4,9 @@ import { asyncHandler } from "@/utils/asyncHandler";
 import { RideRequest } from "@/validations/rideRequest.validations";
 import { Router } from "express";
 const route = Router();
-route.post("/", validateSchema(RideRequest), asyncHandler(registerRideRequest));
+route.post(
+  "/",
+  validateSchema(RideRequest, "body"),
+  asyncHandler(registerRideRequest),
+);
 export default route;
