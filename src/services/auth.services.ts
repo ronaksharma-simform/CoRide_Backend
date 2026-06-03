@@ -116,6 +116,7 @@ export class AuthService {
         where: { id: userWithEmail.id },
         data: { refreshToken: refreshToken.token },
       });
+      userWithEmail.refreshToken = refreshToken.token;
     }
     return { accessToken: accessToken.token, userData: userWithEmail };
   };

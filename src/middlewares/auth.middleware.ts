@@ -12,8 +12,8 @@ const authMiddleware = async (
   next: NextFunction,
 ): Promise<void> => {
   const token = req.cookies.accessToken;
-  logger.info("Access token from cookies:", token);
-  logger.info(req.cookies);
+  // logger.info("Access token from cookies:", token);
+  // logger.info(req.cookies);
   if (!token) {
     throw new AppError(ERROR_CODES.AUTH_TOKEN_MISSING);
   }

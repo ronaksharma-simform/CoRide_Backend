@@ -1,7 +1,7 @@
 import {
   deleteRide,
   getRideData,
-  getUserData,
+  getUserRide,
   registerRide,
   updateRide,
 } from "@/controllers/ride.controller";
@@ -33,12 +33,11 @@ router.put(
   asyncHandler(updateRide),
 );
 
+router.get("/user", asyncHandler(getUserRide));
 router.get(
   "/:id",
   validateSchema(IdSchema, "params"),
   asyncHandler(getRideData),
 );
-
-router.get("/user", asyncHandler(getUserData));
 
 export default router;

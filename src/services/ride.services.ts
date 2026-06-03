@@ -68,21 +68,17 @@ RETURNING *
   ): string => {
     return data.map((point) => `${point.lng} ${point.lat}`).join(", ");
   };
-  static readonly deleteRide = async (id: string): Promise<Ride> => {
-    const rideWithExistingId = await prisma.ride.findUnique({
-      where: { id },
-    });
+  static readonly deleteRide = async (id: string): Promise<TRideDataSchema> => {
+    const rideWithExistingId = await this.getRideData(id);
     if (!rideWithExistingId) throw new AppError("RIDE_NOT_FOUND");
-    const deletedRide = await prisma.ride.delete({ where: { id } });
-    return deletedRide;
+    await prisma.ride.delete({ where: { id } });
+    return rideWithExistingId;
   };
   static readonly updateRide = async (
     rideUpdateData: TRideUpdateSchema,
     id: string,
-  ): Promise<Ride> => {
-    const rideWithExistingId = await prisma.ride.findUnique({
-      where: { id },
-    });
+  ): Promise<TRideDataSchema> => {
+    const rideWithExistingId = await this.getRideData(id);
     if (!rideWithExistingId) throw new AppError("RIDE_NOT_FOUND");
     const updates: string[] = [];
     if (rideUpdateData?.status !== undefined) {
@@ -121,8 +117,32 @@ RETURNING *
         WHERE id = '${id}'
         returning *
         `;
-    const updatedRide = await prisma.$queryRawUnsafe<Ride[]>(query);
-    return updatedRide[0];
+    await prisma.$queryRawUnsafe<Ride[]>(query);
+
+    return {
+      ...rideWithExistingId,
+      ...(rideUpdateData.status !== undefined
+        ? { status: rideUpdateData.status }
+        : {}),
+      ...(rideUpdateData.sourceLabel !== undefined
+        ? { sourceLabel: rideUpdateData.sourceLabel }
+        : {}),
+      ...(rideUpdateData.destinationLabel !== undefined
+        ? { destinationLabel: rideUpdateData.destinationLabel }
+        : {}),
+      ...(rideUpdateData.totalSeats !== undefined
+        ? { totalSeats: rideUpdateData.totalSeats }
+        : {}),
+      ...(rideUpdateData.availableSeats !== undefined
+        ? { availableSeats: rideUpdateData.availableSeats }
+        : {}),
+      ...(rideUpdateData.departureTime !== undefined
+        ? { departureTime: rideUpdateData.departureTime }
+        : {}),
+      ...(rideUpdateData.route !== undefined
+        ? { route: rideUpdateData.route }
+        : {}),
+    };
   };
   static readonly getRideData = async (
     id: string,

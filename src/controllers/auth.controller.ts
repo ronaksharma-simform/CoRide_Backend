@@ -92,10 +92,15 @@ export const refreshToken: RequestHandler = async (req, res) => {
     throw new AppError("AUTH_TOKEN_MISSING");
   }
   const newAccessToken = await AuthService.refreshToken(refreshToken);
+  res.cookie("accessToken", newAccessToken.accessToken, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: config.app.env === "production",
+    expires: new Date(Date.now() + ms(config.jwt.access.expiry)),
+  });
   res.status(HTTP_STATUS_CODES.OK).json({
     success: true,
     message: "Access token refreshed successfully",
-    accessToken: newAccessToken,
   });
 };
 

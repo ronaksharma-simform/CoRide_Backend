@@ -50,10 +50,8 @@ export const Ride = z.object({
     .enum(["ACTIVE", "FULL", "COMPLETED", "CANCELLED"])
     .default("ACTIVE"),
 });
-export const RideUpdateData = z.object({
-  id: z.string(),
-  data: Ride.omit({ vehicleId: true }).partial(),
-});
+export const RideUpdateData = Ride.omit({ vehicleId: true }).partial();
+
 export const RideUpdateSchema = Ride.omit({ vehicleId: true }).partial();
 type TRideUpdateSchema = z.infer<typeof RideUpdateSchema>;
 type TRideUpdateData = z.infer<typeof RideUpdateData>;
