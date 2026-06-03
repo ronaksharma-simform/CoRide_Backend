@@ -126,3 +126,10 @@ export const resendVerificationEmail: RequestHandler = async (req, res) => {
     message: "Email Send Sucessfully",
   });
 };
+export const currentUser: RequestHandler = async (req, res) => {
+  logger.debug(req.user);
+  return res.status(200).json({
+    success: true,
+    data: toUserResponse(req.user),
+  });
+};

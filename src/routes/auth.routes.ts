@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  currentUser,
   login,
   logout,
   refreshToken,
@@ -14,6 +15,7 @@ import {
   UserLoginSchema,
   UserRegistrationSchema,
 } from "@/validations/user.validation";
+import authMiddleware from "@/middlewares/auth.middleware";
 const route = Router();
 
 route.post(
@@ -34,4 +36,5 @@ route.post(
   asyncHandler(validateSchema(ResendVerifyEmailSchema, "body")),
   asyncHandler(resendVerificationEmail),
 );
+route.get("/me", authMiddleware, asyncHandler(currentUser));
 export default route;

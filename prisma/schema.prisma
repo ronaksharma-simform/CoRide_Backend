@@ -55,7 +55,7 @@ model Vehicle {
   color        String
   plateNumber  String   @unique
   seatCapacity Int
-  user         User     @relation(fields: [userId], references: [id])
+  user         User     @relation(fields: [userId], references: [id],onDelete: Cascade)
   createdAt    DateTime @default(now())
   rides        Ride[]
 
@@ -95,8 +95,8 @@ model Ride {
   status           RideStatus                                  @default(ACTIVE)
   createdAt        DateTime                                    @default(now())
   updatedAt        DateTime                                    @default(now())
-  user             User                                        @relation(fields: [providerId], references: [id])
-  vehicle          Vehicle                                     @relation(fields: [vehicleId], references: [id])
+  user             User                                        @relation(fields: [providerId], references: [id],onDelete: Cascade)
+  vehicle          Vehicle                                     @relation(fields: [vehicleId], references: [id],onDelete: Cascade)
   rideRequests     RideRequest[]
 
   @@index([providerId])
@@ -114,8 +114,8 @@ model RideRequest {
   status          RideRequestStatus                    @default(PENDING)
   createdAt       DateTime                             @default(now())
   expiresAt       DateTime?
-  ride            Ride                                 @relation(fields: [rideId], references: [id])
-  user            User                                 @relation(fields: [seekerId], references: [id])
+  ride            Ride                                 @relation(fields: [rideId], references: [id],onDelete: Cascade)
+  user            User                                 @relation(fields: [seekerId], references: [id],onDelete: Cascade)
 
   @@index([seekerId])
   @@index([rideId])

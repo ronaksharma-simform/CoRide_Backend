@@ -1,18 +1,17 @@
 import { prisma } from "@/config/prisma";
-import { Ride, Vehicle } from "@/generated/prisma/client";
+import { Ride } from "@/generated/prisma/client";
 import AppError from "@/utils/customErrorClass";
 import { logger } from "@/utils/logger";
 import {
-  TRide,
   TRideDataSchema,
   TRideUpdateSchema,
 } from "@/validations/ride.validations";
 
 export class RideService {
   static readonly createRide = async (
-    rideRegistrationData: TRide,
+    rideRegistrationData: TRideDataSchema,
     userId: string,
-  ): Promise<Vehicle> => {
+  ): Promise<TRideDataSchema> => {
     const vehicleWithExistingId = await prisma.vehicle.findUnique({
       where: { id: rideRegistrationData.vehicleId },
     });
@@ -21,7 +20,7 @@ export class RideService {
     }
     logger.debug("Creating ride with data: ");
     logger.debug(rideRegistrationData);
-    const responseData = await prisma.$queryRaw<Vehicle[]>`
+    const responseData = await prisma.$queryRaw<TRideDataSchema[]>`
  INSERT INTO "Ride" (
     "providerId",
     "vehicleId",
@@ -58,6 +57,10 @@ VALUES (
 )
 RETURNING *
 `;
+    responseData[0].sourceLabel = rideRegistrationData.sourceLabel;
+    responseData[0].destinationLabel = rideRegistrationData.destinationLabel;
+    responseData[0].route = rideRegistrationData.route;
+    // console.log(responseData[0]);
     return responseData[0];
   };
   static readonly createLineString = (
