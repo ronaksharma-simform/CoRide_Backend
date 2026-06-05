@@ -3,6 +3,7 @@ import { Ride } from "@/generated/prisma/client";
 import AppError from "@/utils/customErrorClass";
 import { logger } from "@/utils/logger";
 import {
+  TFindRideSchema,
   TRideDataSchema,
   TRideUpdateSchema,
 } from "@/validations/ride.validations";
@@ -218,8 +219,58 @@ RETURNING *
       ) AS "route"
 
     FROM "Ride"
-    where "providerId" = ${id}
+    where "providerId" = ${id} LIMIT 20 order by createdAt
   `;
     return result;
+  };
+  static readonly findRide = async (
+    userPref: TFindRideSchema,
+  ): Promise<TRideDataSchema> => {
+    const findRideQuery = `  
+      WITH FilteredRides AS (
+    SELECT
+         "providerId",
+      "vehicleId",
+      "departureTime",
+      "totalSeats",
+      "availableSeats",
+      status,
+      "createdAt",
+      "updatedAt",
+      json_build_object(
+        'lng', ST_X("sourceLabel"::geometry),
+        'lat', ST_Y("sourceLabel"::geometry)
+      ) AS "sourceLabel",
+      json_build_object(
+        'lng', ST_X("destinationLabel"::geometry),
+        'lat', ST_Y("destinationLabel"::geometry)
+      ) AS "destinationLabel",
+      (
+        SELECT json_agg(json_build_object('lng', ST_X(geom), 'lat', ST_Y(geom)))
+        FROM ST_DumpPoints("route"::geometry)
+      ) AS "route",
+        "id",
+        ST_Distance(route::geography, ST_GeogFromText('SRID=4326;POINT(${userPref.source.lng} ${userPref.source.lat})')) AS distanceMeter,
+        ABS(EXTRACT(EPOCH FROM ("departureTime" - '${new Date().toISOString()}'::timestamp)) / 3600.0) AS hour_difference,
+        '${userPref.priority}' as priority
+    FROM "Ride"
+    WHERE route IS NOT NULL 
+      AND "departureTime" IS NOT NULL
+      AND "availableSeats" >= ${userPref.seats}
+      AND ST_DWithin(
+          route::geography,
+          ST_GeogFromText('SRID=4326;POINT(${userPref.source.lng} ${userPref.source.lat})'),
+          ${userPref.maxWalkingDistanceMeters}
+      )
+)
+SELECT * FROM FilteredRides
+WHERE hour_difference <= ${userPref.maxTimeWindowHours}
+ORDER BY 
+    CASE WHEN priority = 'TIME' THEN hour_difference END ASC,
+    CASE WHEN priority = 'DISTANCE' THEN distanceMeter END ASC;
+    LIMIT 10
+      `;
+    const data = await prisma.$queryRawUnsafe<TRideDataSchema>(findRideQuery);
+    return data;
   };
 }

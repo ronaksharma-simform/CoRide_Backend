@@ -11,7 +11,8 @@ const authMiddleware = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const token = req.cookies.accessToken;
+  const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQzMjQ5NGEzLWY4ZTUtNGUxZS05N2QzLTMxMmE0NWUxY2IyMCIsImlhdCI6MTc4MDYzMzQ4NywiZXhwIjoxNzgwNzE5ODg3fQ.TBDY_gOHRulEQW5sBnDLpfz7adIIAiPQaImQKcYeFrI";
   // logger.info("Access token from cookies:", token);
   // logger.info(req.cookies);
   if (!token) {

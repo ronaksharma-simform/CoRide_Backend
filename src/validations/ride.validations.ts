@@ -4,7 +4,7 @@ export const cooridinateSchema = z.object({
   lat: z.number().min(-90).max(90),
   lng: z.number().min(-180).max(180),
 });
-type TRideDataSchema = {
+interface TRideDataSchema {
   id: string;
   providerId: string;
   vehicleId: string;
@@ -17,7 +17,8 @@ type TRideDataSchema = {
   status: string;
   createdAt: Date;
   updatedAt: Date;
-};
+}
+// interface TRideFindSchema extends TRideDataSchema {}
 export const Ride = z.object({
   vehicleId: z.string().uuid("Vehicle Id is required"), // Fixed: z.string().uuid()
   sourceLabel: cooridinateSchema,
@@ -51,9 +52,44 @@ export const Ride = z.object({
     .default("ACTIVE"),
 });
 export const RideUpdateData = Ride.omit({ vehicleId: true }).partial();
+export const findRideSchema = z.object({
+  source: cooridinateSchema,
+  destination: cooridinateSchema,
 
+  seats: z
+    .number()
+    .int("Seat number must be an integer")
+    .min(1, "You must request at least 1 seat")
+    .max(10, "Seat capacity cannot exceed 10"),
+
+  priority: z.enum(["TIME", "DISTANCE"]).default("TIME"),
+
+  departureTime: z
+    .string()
+    .datetime({ message: "Invalid ISO datetime string" }),
+
+  maxTimeWindowHours: z
+    .number()
+    .min(0.1, "Minimum time window is 10 minutes")
+    .max(24, "Maximum time window is 24 hours")
+    .default(1.0),
+  maxWalkingDistanceMeters: z
+    .number()
+    .int()
+    .min(100, "Distance threshold must be at least 100 meters")
+    .max(10000, "Distance threshold cannot exceed 10 kilometers")
+    .default(1000),
+});
 export const RideUpdateSchema = Ride.omit({ vehicleId: true }).partial();
 type TRideUpdateSchema = z.infer<typeof RideUpdateSchema>;
 type TRideUpdateData = z.infer<typeof RideUpdateData>;
 type TRide = z.infer<typeof Ride>;
-export { TRide, TRideUpdateSchema, TRideUpdateData, TRideDataSchema };
+type TFindRideSchema = z.infer<typeof findRideSchema>;
+export {
+  TRide,
+  TRideUpdateSchema,
+  TRideUpdateData,
+  TRideDataSchema,
+  TFindRideSchema,
+  //   TRideFindSchema,
+};
