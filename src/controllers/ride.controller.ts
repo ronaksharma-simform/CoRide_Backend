@@ -1,7 +1,6 @@
 import { HTTP_STATUS_CODES } from "@/constants/httpCodes";
 
 import { RideService } from "@/services/ride.services";
-import { logger } from "@/utils/logger";
 
 import { RequestHandler } from "express";
 
@@ -56,13 +55,23 @@ export const getRideData: RequestHandler = async (req, res) => {
 };
 
 export const getUserRide: RequestHandler = async (req, res) => {
-  logger.debug("User ID in getUserRide controller:", req.user.id);
   const responseData = await RideService.getUserRide(req.user.id);
 
   res.status(HTTP_STATUS_CODES.OK).json({
     success: true,
 
     message: "All Rides of User ",
+
+    data: responseData,
+  });
+};
+export const findRide: RequestHandler = async (req, res) => {
+  const responseData = await RideService.findRide(req.body);
+
+  res.status(HTTP_STATUS_CODES.OK).json({
+    success: true,
+
+    message: "Rides matching user preferences ",
 
     data: responseData,
   });

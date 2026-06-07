@@ -1,5 +1,6 @@
 import {
   deleteRide,
+  findRide,
   getRideData,
   getUserRide,
   registerRide,
@@ -12,7 +13,11 @@ import { asyncHandler } from "@/utils/asyncHandler";
 
 import { IdSchema } from "@/validations/common.validations";
 
-import { Ride, RideUpdateData } from "@/validations/ride.validations";
+import {
+  findRideSchema,
+  Ride,
+  RideUpdateData,
+} from "@/validations/ride.validations";
 
 import { Router } from "express";
 
@@ -39,5 +44,9 @@ router.get(
   validateSchema(IdSchema, "params"),
   asyncHandler(getRideData),
 );
-
+router.post(
+  "/find",
+  validateSchema(findRideSchema, "body"),
+  asyncHandler(findRide),
+);
 export default router;

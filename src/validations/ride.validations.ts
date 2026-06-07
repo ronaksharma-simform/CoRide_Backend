@@ -18,7 +18,10 @@ interface TRideDataSchema {
   createdAt: Date;
   updatedAt: Date;
 }
-// interface TRideFindSchema extends TRideDataSchema {}
+interface TRideFindDataSchema extends TRideDataSchema {
+  distanceMeter: number;
+  priority: "TIME" | "DISTANCE";
+}
 export const Ride = z.object({
   vehicleId: z.string().uuid("Vehicle Id is required"), // Fixed: z.string().uuid()
   sourceLabel: cooridinateSchema,
@@ -84,12 +87,12 @@ export const RideUpdateSchema = Ride.omit({ vehicleId: true }).partial();
 type TRideUpdateSchema = z.infer<typeof RideUpdateSchema>;
 type TRideUpdateData = z.infer<typeof RideUpdateData>;
 type TRide = z.infer<typeof Ride>;
-type TFindRideSchema = z.infer<typeof findRideSchema>;
+type TFindRideRequestSchema = z.infer<typeof findRideSchema>;
 export {
   TRide,
   TRideUpdateSchema,
   TRideUpdateData,
   TRideDataSchema,
-  TFindRideSchema,
-  //   TRideFindSchema,
+  TFindRideRequestSchema,
+  TRideFindDataSchema,
 };

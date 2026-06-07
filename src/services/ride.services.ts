@@ -3,8 +3,9 @@ import { Ride } from "@/generated/prisma/client";
 import AppError from "@/utils/customErrorClass";
 import { logger } from "@/utils/logger";
 import {
-  TFindRideSchema,
+  TFindRideRequestSchema,
   TRideDataSchema,
+  TRideFindDataSchema,
   TRideUpdateSchema,
 } from "@/validations/ride.validations";
 
@@ -219,13 +220,13 @@ RETURNING *
       ) AS "route"
 
     FROM "Ride"
-    where "providerId" = ${id} LIMIT 20 order by createdAt
+    where "providerId" = ${id} order by "createdAt" LIMIT 20
   `;
     return result;
   };
   static readonly findRide = async (
-    userPref: TFindRideSchema,
-  ): Promise<TRideDataSchema> => {
+    userPref: TFindRideRequestSchema,
+  ): Promise<TRideFindDataSchema> => {
     const findRideQuery = `  
       WITH FilteredRides AS (
     SELECT
@@ -267,10 +268,11 @@ SELECT * FROM FilteredRides
 WHERE hour_difference <= ${userPref.maxTimeWindowHours}
 ORDER BY 
     CASE WHEN priority = 'TIME' THEN hour_difference END ASC,
-    CASE WHEN priority = 'DISTANCE' THEN distanceMeter END ASC;
+    CASE WHEN priority = 'DISTANCE' THEN distanceMeter END ASC
     LIMIT 10
       `;
-    const data = await prisma.$queryRawUnsafe<TRideDataSchema>(findRideQuery);
+    const data =
+      await prisma.$queryRawUnsafe<TRideFindDataSchema>(findRideQuery);
     return data;
   };
 }

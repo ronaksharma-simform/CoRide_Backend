@@ -38,7 +38,7 @@ SELECT
             ST_GeomFromText('${point}', 4326)
         )
     ) AS closest_point
-FROM "Ride" Order by distance LIMIT 5;
+FROM "Ride" where id = '${rideRequestRegistrationData.rideId}'
 `;
 
     logger.debug(rideDistanceQuery);
