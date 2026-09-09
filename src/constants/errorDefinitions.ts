@@ -247,4 +247,20 @@ export const ERROR_MAP: Record<
     message: "No data given to update ride",
     statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
   },
+
+  // 💺 SEAT
+  SEAT_INVALID_NUMBER: {
+    message: "Seat number is invalid for this ride",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  SEAT_DRIVER_SEAT_NOT_BOOKABLE: {
+    message: "The driver seat cannot be booked by a passenger",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
+
+  SEAT_ALREADY_BOOKED: {
+    message: "The selected seat is already booked",
+    statusCode: HTTP_STATUS_CODES.CONFLICT,
+  },
 };
