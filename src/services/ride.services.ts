@@ -1,6 +1,7 @@
 import { prisma } from "@/config/prisma";
 import { Ride, Vehicle } from "@/generated/prisma/client";
 import AppError from "@/utils/customErrorClass";
+import { assertTransition } from "@/services/tracking.services";
 import { logger } from "@/utils/logger";
 import {
   TRide,
@@ -76,11 +77,18 @@ RETURNING *
   static readonly updateRide = async (
     rideUpdateData: TRideUpdateSchema,
     id: string,
+    userId: string,
   ): Promise<Ride> => {
     const rideWithExistingId = await prisma.ride.findUnique({
       where: { id },
     });
     if (!rideWithExistingId) throw new AppError("RIDE_NOT_FOUND");
+    const statusChanged =
+      rideUpdateData?.status !== undefined &&
+      rideUpdateData.status !== rideWithExistingId.status;
+    if (statusChanged) {
+      assertTransition(rideWithExistingId.status, rideUpdateData.status!);
+    }
     const updates: string[] = [];
     if (rideUpdateData?.status !== undefined) {
       updates.push(`"status" = '${rideUpdateData.status}'`);
@@ -119,6 +127,16 @@ RETURNING *
         returning *
         `;
     const updatedRide = await prisma.$queryRawUnsafe<Ride[]>(query);
+    if (statusChanged) {
+      await prisma.rideStatusHistory.create({
+        data: {
+          rideId: id,
+          fromStatus: rideWithExistingId.status,
+          toStatus: rideUpdateData.status!,
+          changedBy: userId,
+        },
+      });
+    }
     return updatedRide[0];
   };
   static readonly getRideData = async (
