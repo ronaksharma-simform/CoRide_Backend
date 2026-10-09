@@ -58,8 +58,9 @@ export const decodeToken = (token: string, type: TokenType): TokenPayload => {
 
     throw new AppError(ERROR_CODES.AUTH_INVALID_TOKEN);
   } catch (err) {
+    if (err instanceof AppError) throw err;
     if (err instanceof jwt.TokenExpiredError) {
-      throw new AppError(ERROR_CODES.AUTH_INVALID_TOKEN);
+      throw new AppError(ERROR_CODES.TOKEN_EXPIRED);
     }
 
     if (err instanceof jwt.JsonWebTokenError) {

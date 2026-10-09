@@ -43,7 +43,7 @@ export class AuthService {
         password: hashedPassword,
         orgName: userRegistrationData.orgName,
         gender: userRegistrationData.gender,
-        role: "USER",
+        role: userRegistrationData.role,
         isIdVerified: false,
         refreshToken: refreshToken.token,
       },
@@ -89,7 +89,7 @@ export class AuthService {
       where: { email: userLoginData.email },
     });
     if (!userWithEmail) {
-      throw new AppError("AUTH_USER_NOT_FOUND");
+      throw new AppError("AUTH_INVALID_CREDENTIALS");
     }
     const isPasswordValid = await bcrypt.compare(
       userLoginData.password,
@@ -107,17 +107,18 @@ export class AuthService {
       { id: userWithEmail.id },
       TokenType.ACCESS,
     );
+    let userData = userWithEmail;
     if (userWithEmail.refreshToken === "") {
       const refreshToken = generateToken(
         { id: userWithEmail.id },
         TokenType.REFRESH,
       );
-      await prisma.user.update({
+      userData = await prisma.user.update({
         where: { id: userWithEmail.id },
         data: { refreshToken: refreshToken.token },
       });
     }
-    return { accessToken: accessToken.token, userData: userWithEmail };
+    return { accessToken: accessToken.token, userData };
   };
   static readonly refreshToken = async (
     refreshToken: string,

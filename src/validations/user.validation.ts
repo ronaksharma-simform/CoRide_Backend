@@ -50,7 +50,7 @@ export const User = z.object({
   phone: z.string().regex(/^[6-9]\d{9}$/, "Invalid Indian phone number"),
 
   orgName: z.string(),
-  role: z.enum(["USER", "ADMIN"]).default("USER"),
+  role: z.enum(["RIDER", "DRIVER", "ADMIN"]).default("RIDER"),
   gender: z.enum(["MALE", "FEMALE"]),
   isOrgVerified: z.boolean().optional(),
   refreshToken: z.string().optional(),
@@ -70,7 +70,7 @@ export const UserRegistrationSchema = User.pick({
   phone: true,
   orgName: true,
   gender: true,
-});
+}).extend({ role: z.enum(["RIDER", "DRIVER"]).default("RIDER") });
 export const UserLoginSchema = User.pick({ email: true, password: true });
 export const UserResponseSchema = User.pick({
   username: true,

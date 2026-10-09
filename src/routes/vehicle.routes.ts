@@ -4,12 +4,14 @@ import {
   getVehicle,
   registerVehicle,
 } from "@/controllers/vehicle.controller";
+import { requireRole } from "@/middlewares/role.middleware";
 import validateSchema from "@/middlewares/schema.middleware";
 import { asyncHandler } from "@/utils/asyncHandler";
 import { IdSchema } from "@/validations/common.validations";
 import { VehicleRegisterSchema } from "@/validations/vehicle.validations";
 import { Router } from "express";
 const route = Router();
+route.use(requireRole("DRIVER"));
 
 route.post(
   "/",
