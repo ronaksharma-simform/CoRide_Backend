@@ -3,6 +3,7 @@ import errorMiddleware from "./middlewares/error.middleware";
 import authRoutes from "./routes/auth.routes";
 import vehicleRoutes from "./routes/vehicle.routes";
 import rideRoutes from "./routes/ride.routes";
+import matchRoutes from "./routes/match.routes";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -29,6 +30,7 @@ app.get("/health", authMiddleware, (_, res) => {
 app.use("/api", authMiddleware);
 app.use("/api/vehicle", vehicleRoutes);
 app.use("/api/ride", rideRoutes);
+app.use("/api/match", matchRoutes);
 // error handler (always last)
 app.use(errorMiddleware);
 export default app;
