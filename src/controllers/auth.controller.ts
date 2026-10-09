@@ -84,7 +84,7 @@ export const refreshToken: RequestHandler = async (req, res) => {
   res.status(HTTP_STATUS_CODES.OK).json({
     success: true,
     message: "Access token refreshed successfully",
-    accessToken: newAccessToken,
+    accessToken: newAccessToken.accessToken,
   });
 };
 

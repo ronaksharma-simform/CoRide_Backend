@@ -45,8 +45,13 @@ export const ERROR_MAP: Record<
   },
 
   AUTH_INVALID_TOKEN: {
-    message: "Authorization token is invalid or expired",
+    message: "Authorization token is invalid",
     statusCode: HTTP_STATUS_CODES.UNAUTHORIZED,
+  },
+
+  AUTH_FORBIDDEN: {
+    message: "You do not have permission to access this resource",
+    statusCode: HTTP_STATUS_CODES.FORBIDDEN,
   },
 
   AUTH_USER_NOT_FOUND: {
@@ -55,7 +60,7 @@ export const ERROR_MAP: Record<
   },
 
   AUTH_INVALID_CREDENTIALS: {
-    message: "Invalid password",
+    message: "Invalid email or password",
     statusCode: HTTP_STATUS_CODES.UNAUTHORIZED,
   },
 
@@ -103,7 +108,7 @@ export const ERROR_MAP: Record<
 
   // 🔒 TOKEN / VERIFICATION
   TOKEN_EXPIRED: {
-    message: "Token has expired",
+    message: "Authorization token has expired",
     statusCode: HTTP_STATUS_CODES.UNAUTHORIZED,
   },
 

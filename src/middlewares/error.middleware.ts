@@ -3,7 +3,7 @@ import CustomError from "@/utils/customErrorClass";
 import { ErrorRequestHandler } from "express";
 const errorMiddleware: ErrorRequestHandler = (
   error: CustomError,
-  req,
+  _req,
   res,
   next,
 ) => {
@@ -15,6 +15,7 @@ const errorMiddleware: ErrorRequestHandler = (
 
   res.status(statusCode).json({
     success: false,
+    code: error.code,
     message: message,
   });
   next();
