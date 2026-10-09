@@ -252,4 +252,26 @@ export const ERROR_MAP: Record<
     message: "No data given to update ride",
     statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
   },
+
+  // 💳 PAYMENT
+  PAYMENT_NOT_FOUND: {
+    message: "Payment not found",
+    statusCode: HTTP_STATUS_CODES.NOT_FOUND,
+  },
+  PAYMENT_RIDE_NOT_COMPLETED: {
+    message: "Only a completed ride can be paid for",
+    statusCode: HTTP_STATUS_CODES.CONFLICT,
+  },
+  PAYMENT_ALREADY_EXISTS: {
+    message: "A payment already exists for this ride",
+    statusCode: HTTP_STATUS_CODES.CONFLICT,
+  },
+  PAYMENT_INVALID_STATE: {
+    message: "Payment is not in a state that allows this action",
+    statusCode: HTTP_STATUS_CODES.CONFLICT,
+  },
+  PAYMENT_TIMED_OUT: {
+    message: "Payment was not confirmed in time and has expired",
+    statusCode: HTTP_STATUS_CODES.CONFLICT,
+  },
 };
