@@ -107,17 +107,18 @@ export class AuthService {
       { id: userWithEmail.id },
       TokenType.ACCESS,
     );
+    let userData = userWithEmail;
     if (userWithEmail.refreshToken === "") {
       const refreshToken = generateToken(
         { id: userWithEmail.id },
         TokenType.REFRESH,
       );
-      await prisma.user.update({
+      userData = await prisma.user.update({
         where: { id: userWithEmail.id },
         data: { refreshToken: refreshToken.token },
       });
     }
-    return { accessToken: accessToken.token, userData: userWithEmail };
+    return { accessToken: accessToken.token, userData };
   };
   static readonly refreshToken = async (
     refreshToken: string,

@@ -56,15 +56,31 @@ const users: Record<string, Row> = {
     refreshToken: "",
   },
 };
+// Rows come back as copies, like a real query, so a stale read stays stale.
+const copy = (row?: Row): Row | null => (row ? { ...row } : null);
 // Stand in for the database: look users up by id or email from the table above.
 (prisma.user as unknown as { findUnique: unknown }).findUnique = async ({
   where,
 }: {
   where: { id?: string; email?: string };
 }): Promise<Row | null> =>
-  Object.values(users).find(
-    (u) => u.id === where.id || u.email === where.email,
-  ) ?? null;
+  copy(
+    Object.values(users).find(
+      (u) => u.id === where.id || u.email === where.email,
+    ),
+  );
+
+(prisma.user as unknown as { update: unknown }).update = async ({
+  where,
+  data,
+}: {
+  where: { id: string };
+  data: Row;
+}): Promise<Row> => {
+  const row = Object.values(users).find((u) => u.id === where.id)!;
+  Object.assign(row, data);
+  return copy(row)!;
+};
 
 const server = app.listen(0);
 const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
@@ -75,17 +91,22 @@ const token = (id: string, opts: jwt.SignOptions = { expiresIn: 60 }): string =>
 const call = async (
   method: string,
   path: string,
-  opts: { bearer?: string; body?: unknown } = {},
-): Promise<{ status: number; json: { code?: string } }> => {
+  opts: { bearer?: string; body?: unknown; cookie?: string } = {},
+): Promise<{ status: number; json: { code?: string }; cookie: string }> => {
   const res = await fetch(base + path, {
     method,
     headers: {
       "content-type": "application/json",
       ...(opts.bearer ? { authorization: `Bearer ${opts.bearer}` } : {}),
+      ...(opts.cookie ? { cookie: opts.cookie } : {}),
     },
     body: opts.body && method !== "GET" ? JSON.stringify(opts.body) : undefined,
   });
-  return { status: res.status, json: (await res.json()) as { code?: string } };
+  return {
+    status: res.status,
+    json: (await res.json()) as { code?: string },
+    cookie: (res.headers.get("set-cookie") ?? "").split(";")[0],
+  };
 };
 
 test("protected route without a token is 401 AUTH_TOKEN_MISSING", async () => {
@@ -195,4 +216,32 @@ test("login: unverified account is refused", async () => {
 test("refresh without cookie is AUTH_TOKEN_MISSING", async () => {
   const r = await call("POST", "/auth/refresh-token");
   assert.equal(r.json.code, "AUTH_TOKEN_MISSING");
+});
+
+test("login after logout sets a usable refresh cookie", async () => {
+  const creds = { email: "rider@x.com", password: "Passw0rd!x" };
+  const first = await call("POST", "/auth/login", { body: creds });
+  assert.match(first.cookie, /^refreshToken=.+/);
+
+  const refreshed = await call("POST", "/auth/refresh-token", {
+    cookie: first.cookie,
+  });
+  assert.equal(refreshed.status, 200);
+
+  const out = await call("POST", "/auth/logout", { cookie: first.cookie });
+  assert.equal(out.status, 200);
+  assert.equal(users.rider.refreshToken, "");
+
+  const stale = await call("POST", "/auth/refresh-token", {
+    cookie: first.cookie,
+  });
+  assert.equal(stale.status, 401);
+
+  const again = await call("POST", "/auth/login", { body: creds });
+  assert.match(again.cookie, /^refreshToken=.+/);
+  assert.equal(again.cookie, `refreshToken=${users.rider.refreshToken}`);
+  const ok = await call("POST", "/auth/refresh-token", {
+    cookie: again.cookie,
+  });
+  assert.equal(ok.status, 200);
 });
