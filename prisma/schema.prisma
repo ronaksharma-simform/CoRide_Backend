@@ -32,6 +32,7 @@ model User {
   createdAt     DateTime  @default(now())
   vehicles      Vehicle[]
   rides         Ride[]
+  payments      Payment[]
 
   @@index([email])
 }
@@ -83,4 +84,42 @@ model Ride {
   updatedAt        DateTime                                   @default(now())
   user             User                                       @relation(fields: [providerId], references: [id])
   vehicle          Vehicle                                    @relation(fields: [vehicleId], references: [id])
+  payments         Payment[]
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  TIMED_OUT
+  REFUNDED
+}
+
+// All money is stored in minor currency units (integers), never floats.
+model Payment {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  rideId          String        @db.Uuid
+  riderId         String
+  distanceMeters  Int
+  durationMinutes Int
+  surgeMultiplier Float
+  baseFare        Int
+  distanceFare    Int
+  timeFare        Int
+  amount          Int
+  currency        String        @default("INR")
+  status          PaymentStatus @default(PENDING)
+  failureReason   String?
+  refundReason    String?
+  gatewayRef      String?
+  paidAt          DateTime?
+  refundedAt      DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now())
+  ride            Ride          @relation(fields: [rideId], references: [id])
+  rider           User          @relation(fields: [riderId], references: [id])
+
+  @@unique([rideId, riderId])
+  @@index([riderId])
+  @@index([status])
 }
