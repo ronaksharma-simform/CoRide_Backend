@@ -6,8 +6,8 @@ import { logger } from "@/utils/logger";
 import { TLocation } from "@/validations/tracking.validations";
 
 export const TRANSITIONS: Record<RideStatus, RideStatus[]> = {
-  ACTIVE: ["IN_PROGRESS", "CANCELLED"],
-  FULL: ["IN_PROGRESS", "CANCELLED"],
+  ACTIVE: ["FULL", "IN_PROGRESS", "CANCELLED"],
+  FULL: ["ACTIVE", "IN_PROGRESS", "CANCELLED"],
   IN_PROGRESS: ["COMPLETED", "CANCELLED"],
   COMPLETED: [],
   CANCELLED: [],
@@ -60,21 +60,23 @@ export class TrackingService {
   ): Promise<{ id: string; status: RideStatus }> => {
     const ride = await this.getOwnedRide(rideId, userId);
     assertTransition(ride.status, to);
-    const [updated] = await prisma.$transaction([
-      prisma.ride.update({
-        where: { id: rideId },
+    // Conditional write: a concurrent move changes `status`, so the loser matches 0 rows.
+    const updated = await prisma.$transaction(async (tx) => {
+      const { count } = await tx.ride.updateMany({
+        where: { id: rideId, status: ride.status },
         data: { status: to },
-        select: { id: true, status: true },
-      }),
-      prisma.rideStatusHistory.create({
+      });
+      if (count === 0) throw new AppError("RIDE_INVALID_STATUS_TRANSITION");
+      await tx.rideStatusHistory.create({
         data: {
           rideId,
           fromStatus: ride.status,
           toStatus: to,
           changedBy: userId,
         },
-      }),
-    ]);
+      });
+      return { id: rideId, status: to };
+    });
     logger.info({ rideId, from: ride.status, to }, "ride status changed");
     tripEvents.emit("status", { rideId, from: ride.status, to });
     return updated;

@@ -123,20 +123,28 @@ RETURNING *
     const query = `
         UPDATE "Ride" 
         SET ${updates.join(", ")}
-        WHERE id = '${id}'
+        WHERE id = '${id}'${statusChanged ? ` AND "status" = '${rideWithExistingId.status}'` : ""}
         returning *
         `;
-    const updatedRide = await prisma.$queryRawUnsafe<Ride[]>(query);
-    if (statusChanged) {
-      await prisma.rideStatusHistory.create({
-        data: {
-          rideId: id,
-          fromStatus: rideWithExistingId.status,
-          toStatus: rideUpdateData.status!,
-          changedBy: userId,
-        },
-      });
-    }
+    // One transaction: the status write and its history row land together, and a
+    // concurrent status move makes the guarded UPDATE match no row.
+    const updatedRide = await prisma.$transaction(async (tx) => {
+      const rows = await tx.$queryRawUnsafe<Ride[]>(query);
+      if (statusChanged) {
+        if (rows.length === 0) {
+          throw new AppError("RIDE_INVALID_STATUS_TRANSITION");
+        }
+        await tx.rideStatusHistory.create({
+          data: {
+            rideId: id,
+            fromStatus: rideWithExistingId.status,
+            toStatus: rideUpdateData.status!,
+            changedBy: userId,
+          },
+        });
+      }
+      return rows;
+    });
     return updatedRide[0];
   };
   static readonly getRideData = async (

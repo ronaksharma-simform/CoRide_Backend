@@ -22,7 +22,7 @@ const code =
   (e: { code: string }): boolean =>
     e.code === c;
 const db: Record<string, Record<string, () => unknown>> = {
-  ride: { findUnique: () => null, update: () => null },
+  ride: { findUnique: () => null, update: () => null, updateMany: () => null },
   rideLocation: { findFirst: () => null, create: () => null },
   rideStatusHistory: { create: () => null },
 };
@@ -56,19 +56,26 @@ test("status transitions follow the lifecycle and reject skips", () => {
   );
 });
 
-test("starting a ride updates status, logs history and emits an event", async () => {
-  stubRide("ACTIVE");
-  const update = mock.method(db.ride, "update", () => "u");
-  const hist = mock.method(db.rideStatusHistory, "create", () => "h");
+const stubTx = (): void => {
   Object.defineProperty(prisma, "$transaction", {
-    value: async () => [{ id: "r1", status: "IN_PROGRESS" }],
+    value: async (fn: (tx: unknown) => unknown) => fn(prisma),
     configurable: true,
   });
+};
+
+test("starting a ride updates status, logs history and emits an event", async () => {
+  stubRide("ACTIVE");
+  const update = mock.method(db.ride, "updateMany", () => ({ count: 1 }));
+  const hist = mock.method(db.rideStatusHistory, "create", () => "h");
+  stubTx();
   const events: unknown[] = [];
   tripEvents.once("status", (e) => events.push(e));
   const out = await TrackingService.changeStatus("r1", "u1", "IN_PROGRESS");
   assert.equal(out.status, "IN_PROGRESS");
-  assert.equal(update.mock.callCount(), 1);
+  assert.deepEqual(update.mock.calls[0].arguments[0], {
+    where: { id: "r1", status: "ACTIVE" },
+    data: { status: "IN_PROGRESS" },
+  });
   assert.deepEqual(hist.mock.calls[0].arguments[0], {
     data: {
       rideId: "r1",
@@ -79,6 +86,25 @@ test("starting a ride updates status, logs history and emits an event", async ()
   });
   assert.equal(events.length, 1);
   mock.restoreAll();
+});
+
+test("a lost race on the status write is refused and leaves no history row", async () => {
+  stubRide("ACTIVE");
+  mock.method(db.ride, "updateMany", () => ({ count: 0 }));
+  const hist = mock.method(db.rideStatusHistory, "create", () => "h");
+  stubTx();
+  await assert.rejects(
+    TrackingService.changeStatus("r1", "u1", "IN_PROGRESS"),
+    code("RIDE_INVALID_STATUS_TRANSITION"),
+  );
+  assert.equal(hist.mock.callCount(), 0);
+  mock.restoreAll();
+});
+
+test("ACTIVE and FULL can swap, as PUT /api/ride allowed before tracking", () => {
+  assert.doesNotThrow(() => assertTransition("ACTIVE", "FULL"));
+  assert.doesNotThrow(() => assertTransition("FULL", "ACTIVE"));
+  assert.doesNotThrow(() => assertTransition("FULL", "IN_PROGRESS"));
 });
 
 test("only the ride's driver can act, and only while in progress", async () => {

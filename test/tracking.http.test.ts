@@ -70,7 +70,23 @@ stub(prisma.rideStatusHistory, "create", ({ data }: { data: Row }) => {
   history.push({ ...data, createdAt: new Date() });
   return Promise.resolve(data);
 });
-stub(prisma, "$transaction", (ops: Promise<unknown>[]) => Promise.all(ops));
+stub(
+  prisma.ride,
+  "updateMany",
+  ({ where, data }: { where: Row; data: Row }) => {
+    if (ride.status !== where.status) return Promise.resolve({ count: 0 });
+    Object.assign(ride, data);
+    return Promise.resolve({ count: 1 });
+  },
+);
+stub(prisma, "$queryRawUnsafe", (sql: string) => {
+  const from = /AND "status" = '(\w+)'/.exec(sql)?.[1];
+  if (from && from !== ride.status) return Promise.resolve([]);
+  const to = /"status" = '(\w+)'/.exec(sql)?.[1];
+  if (to) ride.status = to;
+  return Promise.resolve([{ ...ride }]);
+});
+stub(prisma, "$transaction", (fn: (tx: unknown) => unknown) => fn(prisma));
 stub(prisma.rideLocation, "findFirst", async () => locations.at(-1) ?? null);
 stub(prisma.rideLocation, "create", async ({ data }: { data: Row }) => {
   locations.push(data);
@@ -208,6 +224,42 @@ test("PUT /api/ride cannot skip the lifecycle", async () => {
   });
   assert.equal(r.status, 409);
   assert.equal(r.json.code, "RIDE_INVALID_STATUS_TRANSITION");
+});
+
+test("PUT /api/ride still swaps ACTIVE and FULL and logs each move", async () => {
+  history.length = 0;
+  for (const [from, to] of [
+    ["ACTIVE", "FULL"],
+    ["FULL", "ACTIVE"],
+  ]) {
+    Object.assign(ride, { status: from });
+    const r = await call("PUT", "/api/ride", "d1", {
+      id: rideId,
+      data: { status: to },
+    });
+    assert.equal(r.status, 200, `${from} -> ${to}`);
+    assert.equal(ride.status, to);
+  }
+  assert.equal(history.length, 2);
+});
+
+test("PUT /api/ride refuses a status write that lost a race, and logs nothing", async () => {
+  Object.assign(ride, { status: "ACTIVE" });
+  history.length = 0;
+  const realFind = prisma.ride.findUnique;
+  // The guard reads ACTIVE, then another request moves the ride before the write.
+  stub(prisma.ride, "findUnique", async () => {
+    stub(prisma.ride, "findUnique", realFind);
+    const seen = { ...ride };
+    ride.status = "IN_PROGRESS";
+    return seen;
+  });
+  const r = await call("PUT", "/api/ride", "d1", {
+    id: rideId,
+    data: { status: "FULL" },
+  });
+  assert.equal(r.status, 409);
+  assert.equal(history.length, 0);
 });
 
 test("a client-sent recordedAt is accepted when fresh and rejected 400 when stale or in the future", async () => {
