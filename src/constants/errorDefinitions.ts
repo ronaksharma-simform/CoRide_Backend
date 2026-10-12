@@ -252,4 +252,15 @@ export const ERROR_MAP: Record<
     message: "No data given to update ride",
     statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
   },
+
+  // 🤝 MATCH
+  MATCH_REQUEST_NOT_FOUND: {
+    message: "Ride request not found",
+    statusCode: HTTP_STATUS_CODES.NOT_FOUND,
+  },
+
+  MATCH_INVALID_STATE: {
+    message: "Ride request cannot be changed from its current state",
+    statusCode: HTTP_STATUS_CODES.CONFLICT,
+  },
 };
