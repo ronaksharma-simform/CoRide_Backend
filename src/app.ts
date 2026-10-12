@@ -7,6 +7,7 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import authMiddleware from "./middlewares/auth.middleware";
+import { requestLogger } from "./middlewares/requestLogger.middleware";
 const app = express();
 app.use(
   cors({
@@ -15,6 +16,7 @@ app.use(
     credentials: true,
   }),
 );
+app.use(requestLogger());
 app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
