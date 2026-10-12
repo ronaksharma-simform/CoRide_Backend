@@ -29,7 +29,8 @@ const fakeTx = (nearby: string[], rides: Record<string, Row>) => {
     events,
     rides,
     $queryRaw: async (_s: unknown, ...vals: unknown[]) => {
-      const excluded = vals.find(Array.isArray) as string[];
+      const excluded = vals.find(Array.isArray) as string[] | undefined;
+      if (!excluded) return []; // row-lock query
       const id = nearby.find(
         (r) => !excluded.includes(r) && rides[r].availableSeats > 0,
       );

@@ -28,6 +28,8 @@ const load = async (
   actorId: string,
   as: "rider" | "driver",
 ): Promise<RideRequest> => {
+  // Row lock: a concurrent accept/reject/cancel waits, then re-reads the new status.
+  await tx.$queryRaw`SELECT id FROM "RideRequest" WHERE id = ${id} FOR UPDATE`;
   const request = await tx.rideRequest.findUnique({
     where: { id },
     include: { ride: { select: { providerId: true } } },
