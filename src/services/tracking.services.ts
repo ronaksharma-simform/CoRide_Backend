@@ -89,7 +89,8 @@ export class TrackingService {
     if (ride.status !== "IN_PROGRESS")
       throw new AppError("RIDE_NOT_IN_PROGRESS");
     const now = new Date();
-    const recordedAt = point.recordedAt ?? now;
+    // The request body reaches here as parsed JSON, so recordedAt is still a string.
+    const recordedAt = point.recordedAt ? new Date(point.recordedAt) : now;
     const last = await prisma.rideLocation.findFirst({
       where: { rideId },
       orderBy: { recordedAt: "desc" },
@@ -97,7 +98,7 @@ export class TrackingService {
     });
     assertFreshFix(recordedAt, now, last?.recordedAt);
     const saved = await prisma.rideLocation.create({
-      data: { rideId, userId, ...point, recordedAt },
+      data: { rideId, userId, lat: point.lat, lng: point.lng, recordedAt },
       select: { lat: true, lng: true, recordedAt: true },
     });
     tripEvents.emit("location", { rideId, ...saved });
