@@ -317,3 +317,41 @@ test("double accept of the same request takes one seat", { skip }, async () => {
   ]);
   assert.equal((await seats(ride)).availableSeats, 1);
 });
+
+test(
+  "double cancel of an accepted request frees one seat",
+  { skip },
+  async () => {
+    const driver = await mkUser("DRIVER");
+    const ride = await mkRide(driver.id, 960, 990, { seats: 2 });
+    const rider = await mkUser("RIDER");
+    const m = await call("/api/match", rider.id, req(960, 990));
+    const id = m.json.data.id;
+    await call("/api/match/accept", driver.id, { id });
+    assert.equal((await seats(ride)).availableSeats, 1);
+    await Promise.all([
+      call("/api/match/cancel", rider.id, { id }),
+      call("/api/match/cancel", rider.id, { id }),
+    ]);
+    assert.equal((await seats(ride)).availableSeats, 2);
+  },
+);
+
+test(
+  "double reject of the same request is a single reject",
+  { skip },
+  async () => {
+    const driver = await mkUser("DRIVER");
+    await mkRide(driver.id, 1020, 1050, { seats: 2 });
+    const rider = await mkUser("RIDER");
+    const m = await call("/api/match", rider.id, req(1020, 1050));
+    const id = m.json.data.id;
+    const [a, b] = await Promise.all([
+      call("/api/match/reject", driver.id, { id }),
+      call("/api/match/reject", driver.id, { id }),
+    ]);
+    assert.equal([a.status, b.status].filter((s) => s < 300).length, 1);
+    const rejects = (await events(id)).filter((e) => e === "REJECTED");
+    assert.equal(rejects.length, 1);
+  },
+);
