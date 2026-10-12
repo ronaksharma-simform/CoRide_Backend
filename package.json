@@ -7,6 +7,10 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc && tsc-alias && node scripts/mark-dist-cjs.mjs",
     "test": "node --import tsx --test test/*.test.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "start": "node dist/server.js",
     "prepare": "husky"
   },
