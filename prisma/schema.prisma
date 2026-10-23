@@ -64,6 +64,7 @@ model Vehicle {
 enum RideStatus {
   ACTIVE
   FULL
+  IN_PROGRESS
   COMPLETED
   CANCELLED
 }
@@ -83,4 +84,31 @@ model Ride {
   updatedAt        DateTime                                   @default(now())
   user             User                                       @relation(fields: [providerId], references: [id])
   vehicle          Vehicle                                    @relation(fields: [vehicleId], references: [id])
+  locations        RideLocation[]
+  statusHistory    RideStatusHistory[]
+}
+
+model RideLocation {
+  id         String   @id @default(uuid())
+  rideId     String   @db.Uuid
+  userId     String
+  lat        Float
+  lng        Float
+  recordedAt DateTime
+  createdAt  DateTime @default(now())
+  ride       Ride     @relation(fields: [rideId], references: [id], onDelete: Cascade)
+
+  @@index([rideId, recordedAt])
+}
+
+model RideStatusHistory {
+  id         String      @id @default(uuid())
+  rideId     String      @db.Uuid
+  fromStatus RideStatus?
+  toStatus   RideStatus
+  changedBy  String
+  createdAt  DateTime    @default(now())
+  ride       Ride        @relation(fields: [rideId], references: [id], onDelete: Cascade)
+
+  @@index([rideId, createdAt])
 }

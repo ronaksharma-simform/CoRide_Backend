@@ -252,4 +252,16 @@ export const ERROR_MAP: Record<
     message: "No data given to update ride",
     statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
   },
+  RIDE_INVALID_STATUS_TRANSITION: {
+    message: "Ride cannot move to the requested status from its current status",
+    statusCode: HTTP_STATUS_CODES.CONFLICT,
+  },
+  RIDE_NOT_IN_PROGRESS: {
+    message: "Ride is not in progress",
+    statusCode: HTTP_STATUS_CODES.CONFLICT,
+  },
+  RIDE_INVALID_LOCATION: {
+    message: "Location is stale or out of order",
+    statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
+  },
 };
