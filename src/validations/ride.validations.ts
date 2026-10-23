@@ -58,4 +58,87 @@ export const RideUpdateSchema = Ride.omit({ vehicleId: true }).partial();
 type TRideUpdateSchema = z.infer<typeof RideUpdateSchema>;
 type TRideUpdateData = z.infer<typeof RideUpdateData>;
 type TRide = z.infer<typeof Ride>;
-export { TRide, TRideUpdateSchema, TRideUpdateData, TRideDataSchema };
+export const BookSeatSchema = z.object({
+  seatNumber: z
+    .number()
+    .int("Seat number must be an integer")
+    .min(1, "Seat number must be at least 1"),
+});
+type TBookSeatSchema = z.infer<typeof BookSeatSchema>;
+type TRideSeatSchema = {
+  seatNumber: number;
+  kind: "driver" | "passenger";
+  status: "driver" | "booked" | "available";
+  bookedBy: { id: string; name: string } | null;
+};
+type TRideSeatLayoutSchema = {
+  ride: {
+    id: string;
+    providerId: string;
+    vehicleId: string;
+    departureTime: Date;
+    totalSeats: number;
+    availableSeats: number;
+    status: string;
+  };
+  vehicle: {
+    id: string;
+    company: string;
+    model: string;
+    color: string;
+    plateNumber: string;
+    seatCapacity: number;
+  };
+  seats: TRideSeatSchema[];
+  myBooking: number | null;
+};
+type TRideProviderSchema = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  phone: string;
+  avgRating: number;
+  totalRides: number;
+};
+type TRideVehicleSchema = {
+  id: string;
+  company: string;
+  model: string;
+  color: string;
+  plateNumber: string;
+  seatCapacity: number;
+};
+type TRideAvailableSchema = TRideDataSchema & {
+  provider: TRideProviderSchema;
+  vehicle: TRideVehicleSchema;
+};
+type TRideBookingDataSchema = {
+  booking: {
+    id: string;
+    rideId: string;
+    userId: string;
+    seatNumber: number;
+    status: string;
+    createdAt: Date;
+  };
+  ride: {
+    id: string;
+    availableSeats: number;
+    totalSeats: number;
+    status: string;
+  };
+};
+export {
+  TRide,
+  TRideUpdateSchema,
+  TRideUpdateData,
+  TRideDataSchema,
+  TBookSeatSchema,
+  TRideSeatSchema,
+  TRideSeatLayoutSchema,
+  TRideProviderSchema,
+  TRideVehicleSchema,
+  TRideAvailableSchema,
+  TRideBookingDataSchema,
+};
