@@ -8,6 +8,17 @@ describe("getPageInfo", () => {
   });
 
   it("counts total pages", () => {
-    assert.equal(getPageInfo(1, 10, 25).totalPages, 2);
+    assert.equal(getPageInfo(1, 10, 25).totalPages, 3);
+  });
+
+  it("skips (page - 1) * take rows", () => {
+    assert.equal(getPageInfo(1, 10, 25).skip, 0);
+    assert.equal(getPageInfo(3, 10, 25).skip, 20);
+  });
+
+  it("handles bad input", () => {
+    const info = getPageInfo(0, NaN, 25);
+    assert.equal(info.skip, 0);
+    assert.equal(info.take, 10);
   });
 });
