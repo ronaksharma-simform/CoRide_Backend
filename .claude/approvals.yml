@@ -1,0 +1,15 @@
+version: 1
+mode: observe
+rules:
+  - purpose: "A change takes one person who is not the author. When Claude's review passes and the change is 400 lines or fewer, Claude approves and nobody else is needed."
+    paths: ["**"]
+    verdict: { claude: comments, seats: [{ count: 1, from: [humans, "!pr/authors"] }] }
+    override:
+      - { if: "claude/code_review = pass AND pr/diff_lines <= 400", verdict: { claude: approves, seats: 0 } }
+  - purpose: "Auth, payments and the database schema always take one person who is not the author."
+    paths: ["prisma/**", "**/*auth*", "**/*auth*/**", "**/*payment*", "**/*payment*/**"]
+    verdict: { claude: comments, seats: [{ count: 1, from: [humans, "!pr/authors"] }] }
+  - purpose: "A change to the review rules always takes one person who is not the author."
+    paths: ["**/.claude/**", "**/REVIEW.md", "**/.gitattributes", "**/.gitmodules"]
+    nested: inherit
+    verdict: { claude: comments, seats: [{ count: 1, from: [humans, "!pr/authors"] }] }
